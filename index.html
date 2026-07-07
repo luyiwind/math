@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>口算练习 - 100以内不进位不退位加减法</title>
+    <style>
+        :root {
+            --bg: #fdf8f3;
+            --card-bg: #ffffff;
+            --primary: #4a90d9;
+            --primary-hover: #357abd;
+            --accent: #f6a623;
+            --text: #3e3e3e;
+            --text-light: #6b6b6b;
+            --border: #e8e0d8;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --radius: 16px;
+            --font-kid: 'Comic Sans MS', 'KaiTi', 'STKaiti', '楷体', 'Noto Sans SC', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-kid);
+            background: var(--bg);
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(255, 182, 121, 0.10) 0%, transparent 50%),
+                radial-gradient(circle at 85% 75%, rgba(74, 144, 217, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(246, 166, 35, 0.05) 0%, transparent 60%);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ========== 顶部工具栏 ========== */
+        .toolbar {
+            position: sticky;
+            top: 16px;
+            z-index: 100;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            background: var(--card-bg);
+            border-radius: 50px;
+            padding: 12px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 28px;
+            backdrop-filter: blur(8px);
+        }
+        .toolbar button {
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 10px 22px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-generate {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(74, 144, 217, 0.3);
+        }
+        .btn-generate:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(74, 144, 217, 0.4);
+        }
+        .btn-generate:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(74, 144, 217, 0.25);
+        }
+        .btn-print {
+            background: #fff;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .btn-print:hover {
+            background: #f0f7ff;
+            border-color: var(--primary-hover);
+            color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        .btn-answer {
+            background: #fff;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+        .btn-answer:hover {
+            background: #fffaf3;
+            border-color: #e8961a;
+            color: #e8961a;
+            transform: translateY(-2px);
+        }
+        .btn-answer.showing {
+            background: #fff8ee;
+            border-color: #e8961a;
+            color: #d4891a;
+            box-shadow: 0 0 0 4px rgba(246, 166, 35, 0.12);
+        }
+        .toolbar .separator {
+            width: 1px;
+            height: 28px;
+            background: var(--border);
+            margin: 0 4px;
+            border-radius: 1px;
+        }
+        .toolbar .info-badge {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            background: #f9f6f1;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* ========== 主内容卡片 ========== */
+        .main-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 32px 28px 24px;
+            width: 100%;
+            max-width: 1000px;
+            transition: all 0.3s ease;
+        }
+        .main-card .title-area {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .main-card .title-area h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #4a4a4a;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+        .main-card .title-area .subtitle {
+            font-size: 0.9rem;
+            color: #999;
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+        }
+        .title-area .decor {
+            display: inline-block;
+            font-size: 1.4rem;
+            margin: 0 6px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        .title-area .decor:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .title-area .decor:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+        .title-area .decor:nth-child(3) {
+            animation-delay: 0.8s;
+        }
+        @keyframes bounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+            50% {
+                transform: translateY(0);
+            }
+            70% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* ========== 题目网格 ========== */
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 20px;
+            counter-reset: qnum;
+        }
+        @media (min-width: 900px) {
+            .questions-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px 24px;
+            }
+        }
+        .question-item {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            padding: 8px 6px;
+            border-bottom: 1px dashed #f0ebe2;
+            white-space: nowrap;
+            transition: background 0.2s;
+            border-radius: 6px;
+            counter-increment: qnum;
+            position: relative;
+            padding-left: 36px;
+        }
+        .question-item::before {
+            content: counter(qnum) ".";
+            position: absolute;
+            left: 6px;
+            font-size: 0.8rem;
+            color: #c5bfb6;
+            font-weight: 500;
+            min-width: 22px;
+            text-align: right;
+        }
+        .question-item:hover {
+            background: #fefcf9;
+        }
+        .question-item .blank {
+            display: inline-block;
+            min-width: 40px;
+            border-bottom: 2.5px solid #555;
+            margin: 0 4px;
+            text-align: center;
+            color: transparent;
+            transition: all 0.3s;
+            position: relative;
+            font-weight: 700;
+        }
+        .question-item .blank.revealed {
+            color: #e8784a;
+            border-bottom-color: #e8784a;
+            min-width: auto;
+            padding: 0 2px;
+        }
+        .question-item .operator {
+            margin: 0 2px;
+            color: #555;
+        }
+        .question-item .equals {
+            margin: 0 3px;
+            color: #888;
+            font-weight: 500;
+        }
+        .question-item .number {
+            color: #3e3e3e;
+        }
+
+        /* ========== 答案区域 ========== */
+        .answers-section {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 2px dashed #e8e0d8;
+            display: none;
+        }
+        .answers-section.visible {
+            display: block;
+        }
+        .answers-section h3 {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #888;
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+        }
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px 10px;
+            font-size: 0.9rem;
+        }
+        @media (min-width: 900px) {
+            .answers-grid {
+                grid-template-columns: repeat(10, 1fr);
+            }
+        }
+        .answer-item {
+            text-align: center;
+            padding: 5px 4px;
+            background: #fdfaf5;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #e8784a;
+            letter-spacing: 0.3px;
+            font-size: 0.85rem;
+        }
+
+        /* ========== 打印样式 ========== */
+        @media print {
+            body {
+                background: #fff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .toolbar {
+                display: none !important;
+            }
+            .main-card {
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                padding: 8px 12px !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                page-break-after: auto;
+            }
+            .main-card .title-area h1 {
+                font-size: 1.3rem !important;
+                margin-bottom: 2px !important;
+            }
+            .main-card .title-area .subtitle {
+                font-size: 0.7rem !important;
+            }
+            .title-area .decor {
+                display: none !important;
+            }
+            .questions-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 2px 10px !important;
+                font-size: 0.85rem !important;
+            }
+            .question-item {
+                font-size: 0.9rem !important;
+                padding: 3px 2px 3px 28px !important;
+                border-bottom: 1px dotted #ddd !important;
+                letter-spacing: 0.3px !important;
+                white-space: nowrap !important;
+            }
+            .question-item::before {
+                font-size: 0.65rem !important;
+                left: 2px !important;
+                min-width: 18px !important;
+            }
+            .question-item .blank {
+                min-width: 30px !important;
+                border-bottom-width: 2px !important;
+                margin: 0 2px !important;
+            }
+            .question-item .blank.revealed {
+                color: #333 !important;
+                border-bottom-color: #333 !important;
+            }
+            .answers-section {
+                display: none !important;
+            }
+            .main-card .title-area {
+                margin-bottom: 10px !important;
+            }
+            @page {
+                size: A4;
+                margin: 12mm 10mm 12mm 10mm;
+            }
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 640px) {
+            .questions-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px 8px;
+            }
+            .question-item {
+                font-size: 1rem;
+                padding: 6px 2px 6px 28px;
+            }
+            .question-item::before {
+                font-size: 0.7rem;
+                left: 2px;
+                min-width: 20px;
+            }
+            .toolbar {
+                padding: 10px 14px;
+                gap: 8px;
+                border-radius: 36px;
+            }
+            .toolbar button {
+                font-size: 0.85rem;
+                padding: 8px 14px;
+            }
+            .toolbar .separator {
+                display: none;
+            }
+            .toolbar .info-badge {
+                font-size: 0.75rem;
+                padding: 6px 10px;
+            }
+            .main-card {
+                padding: 16px 10px 12px;
+                border-radius: 12px;
+            }
+            .main-card .title-area h1 {
+                font-size: 1.3rem;
+            }
+            .answers-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 4px 6px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 工具栏 -->
+    <div class="toolbar" id="toolbar">
+        <button class="btn-generate" onclick="generateQuestions()" title="重新随机生成50道题">
+            🔄 重新生成
+        </button>
+        <span class="separator"></span>
+        <button class="btn-answer" id="btnAnswer" onclick="toggleAnswers()" title="在屏幕上显示/隐藏答案">
+            👁️ 显示答案
+        </button>
+        <span class="separator"></span>
+        <button class="btn-print" onclick="printQuestions()" title="打印题目（默认不打印答案）">
+            🖨️ 打印题目
+        </button>
+        <span class="info-badge" id="infoBadge">共50道题</span>
+    </div>
+
+    <!-- 主内容卡片 -->
+    <div class="main-card" id="mainCard">
+        <div class="title-area">
+            <span class="decor">🌟</span>
+            <h1>口 算 练 习</h1>
+            <span class="decor">✏️</span>
+            <p class="subtitle">100以内 · 不进位不退位 · 加减法</p>
+            <p class="subtitle" style="font-size:0.75rem;color:#bbb;">姓名：__________ &nbsp;&nbsp; 日期：__________ &nbsp;&nbsp; 用时：__________</p>
+        </div>
+
+        <!-- 题目网格 -->
+        <div class="questions-grid" id="questionsGrid">
+            <!-- 动态生成 -->
+        </div>
+
+        <!-- 答案区域 -->
+        <div class="answers-section" id="answersSection">
+            <h3>📋 答 案 参 考</h3>
+            <div class="answers-grid" id="answersGrid">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ============ 工具函数 ============
+            function randInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            function shuffle(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            /** 获取数字的十位和个位 */
+            function getDigits(n) {
+                return { tens: Math.floor(n / 10), ones: n % 10 };
+            }
+
+            // ============ 生成两数不进位加法 ============
+            function generateNoCarryAddition() {
+                // 生成 A + B，满足个位之和<10，十位之和<10，结果<100
+                const maxAttempts = 200;
+                for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                    const a = randInt(3, 85);
+                    const da = getDigits(a);
+                    // B的十位限制
+                    const maxBTens = Math.min(9, 9 - da.tens);
+                    if (maxBTens < 0) continue;
+                    const bTens = randInt(0, maxBTens);
+                    const maxBOnes = Math.min(9, 9 - da.ones);
+                    if (maxBOnes < 0) continue;
+                    const bOnes = randInt(0, maxBOnes);
+                    const b = bTens * 10 + bOnes;
+                    if (b <= 0) continue;
+                    const result = a + b;
+                    if (result >= 100 || result <= 0) continue;
+                    // 确保至少有一个是两位数，让题目更有意义
+                    if (a < 10 && b < 10 && Math.random() > 0.35) continue;
+                    return { operands: [a, b], operators: ['+'], result };
+                }
+                // 兜底
+                const a = randInt(10, 50);
+                const bTens = randInt(1, Math.min(9, 9 - getDigits(a).tens));
+                const bOnes = randInt(0, Math.min(9, 9 - getDigits(a).ones));
+                const b = bTens * 10 + bOnes;
+                return { operands: [a, b], operators: ['+'], result: a + b };
+            }
+
+            // ============ 生成两数不退位减法 ============
+            function generateNoBorrowSubtraction() {
+                const maxAttempts = 200;
+                for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                    const a = randInt(10, 95);
+                    const da = getDigits(a);
+                    const maxBTens = da.tens;
+                    const maxBOnes = da.ones;
+                    if (maxBTens < 0 || maxBOnes < 0) continue;
+                    const bTens = randInt(0, maxBTens);
+                    const bOnes = randInt(0, maxBOnes);
+                    const b = bTens * 10 + bOnes;
+                    if (b <= 0) continue;
+                    const result = a - b;
+                    if (result < 0 || a === b) continue;
+                    if (a < 10 && b < 10 && Math.random() > 0.35) continue;
+                    return { operands: [a, b], operators: ['-'], result };
+                }
+                const a = randInt(25, 90);
+                const da = getDigits(a);
+                const bTens = randInt(1, da.tens);
+                const bOnes = randInt(0, da.ones);
+                const b = Math.max(1, bTens * 10 + bOnes);
+                return { operands: [a, b], operators: ['-'], result: Math.max(0, a - b) };
+            }
+
+            // ============ 生成三数运算 (A+B+C, A+B-C, A-B+C) ============
+            function generateThreeNumOp() {
+                const opType = randInt(0, 2); // 0:全加, 1:先加后减, 2:先减后加
+                const maxAttempts = 300;
+
+                if (opType === 0) {
+                    // A + B + C，每步不进位
+                    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                        const a = randInt(3, 60);
+                        const da = getDigits(a);
+                        const maxBTens = Math.min(9, 9 - da.tens);
+                        const maxBOnes = Math.min(9, 9 - da.ones);
+                        if (maxBTens < 0 || maxBOnes < 0) continue;
+                        const bTens = randInt(0, maxBTens);
+                        const bOnes = randInt(0, maxBOnes);
+                        const b = bTens * 10 + bOnes;
+                        if (b <= 0) continue;
+                        const s = a + b;
+                        const ds = getDigits(s);
+                        const maxCTens = Math.min(9, 9 - ds.tens);
+                        const maxCOnes = Math.min(9, 9 - ds.ones);
+                        if (maxCTens < 0 || maxCOnes < 0) continue;
+                        const cTens = randInt(0, maxCTens);
+                        const cOnes = randInt(0, maxCOnes);
+                        const c = cTens * 10 + cOnes;
+                        if (c <= 0) continue;
+                        const result = s + c;
+                        if (result >= 100 || result <= 0) continue;
+                        if (a < 10 && b < 10 && c < 10 && Math.random() > 0.3) continue;
+                        return { operands: [a, b, c], operators: ['+', '+'], result };
+                    }
+                } else if (opType === 1) {
+                    // A + B - C，先加不进位，再减不退位
+                    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                        const a = randInt(5, 55);
+                        const da = getDigits(a);
+                        const maxBTens = Math.min(9, 9 - da.tens);
+                        const maxBOnes = Math.min(9, 9 - da.ones);
+                        if (maxBTens < 0 || maxBOnes < 0) continue;
+                        const bTens = randInt(0, maxBTens);
+                        const bOnes = randInt(0, maxBOnes);
+                        const b = bTens * 10 + bOnes;
+                        if (b <= 0) continue;
+                        const s = a + b;
+                        const ds = getDigits(s);
+                        const maxCTens = ds.tens;
+                        const maxCOnes = ds.ones;
+                        if (maxCTens < 0) continue;
+                        const cTens = randInt(0, maxCTens);
+                        const cOnes = randInt(0, maxCOnes);
+                        const c = cTens * 10 + cOnes;
+                        if (c <= 0 || c >= s) continue;
+                        const result = s - c;
+                        if (result < 0 || result >= 100) continue;
+                        return { operands: [a, b, c], operators: ['+', '-'], result };
+                    }
+                } else {
+                    // A - B + C，先减不退位，再加不进位
+                    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                        const a = randInt(15, 80);
+                        const da = getDigits(a);
+                        const maxBTens = da.tens;
+                        const maxBOnes = da.ones;
+                        if (maxBTens < 0 || maxBOnes < 0) continue;
+                        const bTens = randInt(0, maxBTens);
+                        const bOnes = randInt(0, maxBOnes);
+                        const b = bTens * 10 + bOnes;
+                        if (b <= 0 || b >= a) continue;
+                        const d = a - b;
+                        const dd = getDigits(d);
+                        const maxCTens = Math.min(9, 9 - dd.tens);
+                        const maxCOnes = Math.min(9, 9 - dd.ones);
+                        if (maxCTens < 0 || maxCOnes < 0) continue;
+                        const cTens = randInt(0, maxCTens);
+                        const cOnes = randInt(0, maxCOnes);
+                        const c = cTens * 10 + cOnes;
+                        if (c <= 0) continue;
+                        const result = d + c;
+                        if (result >= 100 || result <= 0) continue;
+                        return { operands: [a, b, c], operators: ['-', '+'], result };
+                    }
+                }
+                // 兜底
+                const a = randInt(10, 40);
+                const b = randInt(5, 20);
+                const c = randInt(3, 15);
+                return { operands: [a, b, c], operators: ['+', '+'], result: a + b + c };
+            }
+
+            // ============ 生成单道题 ============
+            function generateSingleQuestion() {
+                // 约65%两数运算，35%三数运算
+                const useThree = Math.random() < 0.35;
+                let questionData;
+
+                if (useThree) {
+                    questionData = generateThreeNumOp();
+                } else {
+                    // 两数运算：加法或减法各约50%
+                    if (Math.random() < 0.5) {
+                        questionData = generateNoCarryAddition();
+                    } else {
+                        questionData = generateNoBorrowSubtraction();
+                    }
+                }
+
+                const { operands, operators, result } = questionData;
+                const totalOps = operands.length;
+
+                // 决定填空位置
+                // 0: 求结果（填空在等号右边）
+                // 1~totalOps: 填空在第1~totalOps个操作数位置
+                let blankPosition;
+                const roll = Math.random();
+                if (roll < 0.45) {
+                    blankPosition = 0; // 求结果
+                } else if (roll < 0.75) {
+                    blankPosition = 1; // 填空在第一个数
+                } else if (roll < 0.95 && totalOps >= 2) {
+                    blankPosition = 2; // 填空在第二个数
+                } else if (totalOps >= 3) {
+                    blankPosition = 3; // 填空在第三个数
+                } else {
+                    blankPosition = 0;
+                }
+
+                // 计算填空的答案
+                let blankAnswer;
+                if (blankPosition === 0) {
+                    blankAnswer = result;
+                } else {
+                    // 需要计算未知数
+                    // 例如：___ + B = Result => 未知数 = Result - B（需验证不退位）
+                    // 或：___ - B = Result => 未知数 = Result + B（需验证不进位）
+                    // 对于三数运算更复杂，但在生成时我们已经确保了整体有效性
+                    blankAnswer = operands[blankPosition - 1];
+                }
+
+                return {
+                    operands,
+                    operators,
+                    result,
+                    blankPosition, // 0=结果位置, 1/2/3=第几个操作数
+                    blankAnswer,
+                    totalOps,
+                };
+            }
+
+            // ============ 批量生成50道题 ============
+            function generateAllQuestions(count = 50) {
+                const questions = [];
+                const seen = new Set();
+                const maxTotalAttempts = count * 30;
+                let totalAttempts = 0;
+
+                while (questions.length < count && totalAttempts < maxTotalAttempts) {
+                    totalAttempts++;
+                    const q = generateSingleQuestion();
+                    // 创建唯一标识以避免完全重复的题目
+                    const key = `${q.operands.join(',')}|${q.operators.join(',')}|${q.blankPosition}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    questions.push(q);
+                }
+
+                // 如果还不够，补充简单题
+                while (questions.length < count) {
+                    const q = generateSingleQuestion();
+                    questions.push(q);
+                }
+
+                return questions;
+            }
+
+            // ============ 渲染题目 ============
+            function renderQuestions(questions) {
+                const grid = document.getElementById('questionsGrid');
+                grid.innerHTML = '';
+
+                questions.forEach((q, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'question-item';
+
+                    // 构建算式显示
+                    let html = '';
+                    const ops = q.operands;
+                    const opSymbols = q.operators;
+                    const totalOps = q.totalOps;
+
+                    for (let i = 0; i < totalOps; i++) {
+                        if (i > 0) {
+                            html +=
+                                `<span class="operator"> ${opSymbols[i - 1]} </span>`;
+                        }
+                        if (q.blankPosition === i + 1) {
+                            // 填空在这个操作数位置
+                            html += `<span class="blank" data-index="${index}">___</span>`;
+                        } else {
+                            html += `<span class="number">${ops[i]}</span>`;
+                        }
+                    }
+
+                    html += `<span class="equals"> = </span>`;
+
+                    if (q.blankPosition === 0) {
+                        // 填空在结果位置
+                        html += `<span class="blank" data-index="${index}">___</span>`;
+                    } else {
+                        html += `<span class="number">${q.result}</span>`;
+                    }
+
+                    item.innerHTML = html;
+                    item.setAttribute('data-qindex', index);
+                    grid.appendChild(item);
+                });
+
+                // 存储题目数据
+                window._currentQuestions = questions;
+                document.getElementById('infoBadge').textContent = `共${questions.length}道题`;
+            }
+
+            // ============ 渲染答案 ============
+            function renderAnswers(questions) {
+                const answersGrid = document.getElementById('answersGrid');
+                answersGrid.innerHTML = '';
+
+                questions.forEach((q, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'answer-item';
+                    div.textContent = `${index + 1}. ${q.blankAnswer}`;
+                    answersGrid.appendChild(div);
+                });
+            }
+
+            // ============ 切换答案显示 ============
+            function toggleAnswers() {
+                const section = document.getElementById('answersSection');
+                const btn = document.getElementById('btnAnswer');
+                const isVisible = section.classList.contains('visible');
+
+                if (isVisible) {
+                    section.classList.remove('visible');
+                    btn.classList.remove('showing');
+                    btn.innerHTML = '👁️ 显示答案';
+                    // 隐藏题目中的答案
+                    document.querySelectorAll('.blank.revealed').forEach(b => b.classList.remove(
+                        'revealed'));
+                    document.querySelectorAll('.blank').forEach(b => b.textContent = '___');
+                } else {
+                    section.classList.add('visible');
+                    btn.classList.add('showing');
+                    btn.innerHTML = '🙈 隐藏答案';
+                    // 在题目中显示答案
+                    const questions = window._currentQuestions || [];
+                    document.querySelectorAll('.blank').forEach((blank, i) => {
+                        if (i < questions.length) {
+                            blank.textContent = questions[i].blankAnswer;
+                            blank.classList.add('revealed');
+                        }
+                    });
+                }
+            }
+
+            // ============ 打印 ============
+            function printQuestions() {
+                // 打印前确保答案在题目中不显示（除非用户已开启）
+                const answersVisible = document.getElementById('answersSection').classList.contains('visible');
+                if (!answersVisible) {
+                    // 确保题目中的blank不显示答案
+                    document.querySelectorAll('.blank.revealed').forEach(b => b.classList.remove('revealed'));
+                    document.querySelectorAll('.blank').forEach(b => {
+                        if (b.classList.contains('revealed')) {
+                            b.textContent = '___';
+                            b.classList.remove('revealed');
+                        } else {
+                            b.textContent = '___';
+                        }
+                    });
+                }
+                window.print();
+                // 打印后恢复（如果答案之前是显示的）
+                if (answersVisible) {
+                    const questions = window._currentQuestions || [];
+                    document.querySelectorAll('.blank').forEach((blank, i) => {
+                        if (i < questions.length) {
+                            blank.textContent = questions[i].blankAnswer;
+                            blank.classList.add('revealed');
+                        }
+                    });
+                }
+            }
+
+            // ============ 初始化 ============
+            function generateQuestions() {
+                const questions = generateAllQuestions(50);
+                renderQuestions(questions);
+                renderAnswers(questions);
+                // 如果答案当前是显示状态，更新题目中的答案显示
+                const answersVisible = document.getElementById('answersSection').classList.contains('visible');
+                if (answersVisible) {
+                    document.querySelectorAll('.blank').forEach((blank, i) => {
+                        if (i < questions.length) {
+                            blank.textContent = questions[i].blankAnswer;
+                            blank.classList.add('revealed');
+                        }
+                    });
+                }
+                // 滚动到题目区域
+                document.getElementById('mainCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // 暴露到全局
+            window.generateQuestions = generateQuestions;
+            window.toggleAnswers = toggleAnswers;
+            window.printQuestions = printQuestions;
+
+            // 页面加载时自动生成
+            document.addEventListener('DOMContentLoaded', () => {
+                generateQuestions();
+            });
+
+            console.log('📝 口算练习生成器已就绪！');
+            console.log('   - 100以内不进位不退位加减法');
+            console.log('   - 每次50道题');
+            console.log('   - 支持两数和三数运算');
+            console.log('   - 填空位置随机变化');
+            console.log('   - 点击"显示答案"查看答案');
+            console.log('   - 点击"打印题目"进行打印');
+            console.log('   🎒 祝小朋友学习进步！');
+        })();
+    </script>
+</body>
+</html>
