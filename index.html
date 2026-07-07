@@ -76,7 +76,6 @@
         .preview.empty { color:#ccc; }
         .btn-done { font-family:inherit; font-size:1rem; font-weight:700; padding:12px; border-radius:12px; border:none; background:var(--success); color:#fff; cursor:pointer; }
 
-        /* 打印样式 */
         @media print {
             body { background:#fff !important; padding:0 !important; }
             .toolbar, .main-card, .keyboard-panel, #exportContainer { display:none !important; }
@@ -94,15 +93,8 @@
             .q-item { font-size:10pt; white-space:nowrap; line-height:1.8; }
         }
 
-        /* 导出容器 */
-        #exportContainer {
-            position: absolute; left: -9999px; top: 0;
-            width: 1000px;
-        }
-        .export-page {
-            padding: 20px; background: #fff; font-family: 'KaiTi','楷体',sans-serif;
-            width: 100%; max-width: 1000px; margin: 0 auto;
-        }
+        #exportContainer { position: absolute; left: -9999px; top: 0; width: 1000px; }
+        .export-page { padding: 20px; background: #fff; font-family: 'KaiTi','楷体',sans-serif; width: 100%; max-width: 1000px; margin: 0 auto; }
         .export-header { text-align:center; margin-bottom:10px; }
         .export-header h2 { font-size: 20pt; }
         .export-info { font-size: 11pt; display:flex; justify-content:center; gap:20px; margin-bottom:10px; }
@@ -172,6 +164,7 @@
     (function() {
         let currentQuestions = [], userAnswers = {}, firstWrongAnswers = {}, errorQuestions = new Set();
         let reviewMode = false, isSubmitted = false, activeIdx = -1, currentInput = '';
+        let isOverwritePending = false; // 覆盖模式标志
         let timerSec = 0, timerInterval = null, timerRunning = false;
         const MAX_LEN = 3;
 
@@ -286,7 +279,7 @@
             const panel = document.getElementById('keyboardPanel');
             panel.classList.remove('visible');
             document.body.style.paddingBottom = '200px';
-            activeIdx=-1; currentInput=''; updateBlanks(); updatePreview();
+            activeIdx=-1; currentInput=''; isOverwritePending = false; updateBlanks(); updatePreview();
             document.querySelectorAll('.active').forEach(el=>el.classList.remove('active'));
             document.querySelectorAll('.active-blank').forEach(el=>el.classList.remove('active-blank'));
         }
@@ -304,7 +297,8 @@
             document.querySelectorAll('.active-blank').forEach(el=>el.classList.remove('active-blank'));
             activeIdx=idx;
             currentInput = userAnswers[idx] || '';
-            // 如果是修改错误题目，第一次输入数字时会自动覆盖，但先保留旧值显示
+            // 如果是批改模式且该题是错误题，开启覆盖模式
+            isOverwritePending = reviewMode && errorQuestions.has(idx);
             updateBlanks(); updatePreview();
             showKey();
             setTimeout(() => {
@@ -326,9 +320,10 @@
         }
         function digit(d){
             if(activeIdx<0) return;
-            // 修改错误题目时，首次输入直接覆盖
-            if(reviewMode && errorQuestions.has(activeIdx) && currentInput === userAnswers[activeIdx]) {
+            // 覆盖模式：首次输入清空旧答案
+            if(isOverwritePending){
                 currentInput = '';
+                isOverwritePending = false;
             }
             if(currentInput.length >= MAX_LEN) return;
             currentInput += d;
@@ -340,11 +335,13 @@
             currentInput = currentInput.slice(0,-1);
             userAnswers[activeIdx] = currentInput;
             if(!currentInput) delete userAnswers[activeIdx];
+            isOverwritePending = false; // 手动修改后取消覆盖模式
             updateBlanks(); updatePreview(); updateBtn();
         }
         function clearInput(){
             if(activeIdx<0) return;
             currentInput = ''; delete userAnswers[activeIdx];
+            isOverwritePending = false;
             updateBlanks(); updatePreview(); updateBtn();
         }
         function confirmNext(){
@@ -383,7 +380,7 @@
         function renderScreen(qs){
             let grid=document.getElementById('questionsGrid'); grid.innerHTML='';
             currentQuestions=qs; userAnswers={}; firstWrongAnswers={}; errorQuestions.clear(); reviewMode=false; isSubmitted=false;
-            activeIdx=-1; currentInput=''; hideKey();
+            activeIdx=-1; currentInput=''; isOverwritePending = false; hideKey();
             qs.forEach((q,i)=>{
                 let item=document.createElement('div'); item.className='question-item'; item.dataset.qindex=i;
                 item.onclick=function(e){ if(e.target.classList.contains('blank')){ e.stopPropagation(); activateQuestion(i); } };
@@ -431,7 +428,6 @@
             let name = document.getElementById('studentName').value || '未填';
             let date = document.getElementById('practiceDate').value || new Date().toISOString().slice(0,10);
             let time = document.getElementById('timerDisplay').textContent;
-            // 独立批改逻辑
             let tempErrors = new Set();
             currentQuestions.forEach((q,i)=>{
                 let u = userAnswers[i];
@@ -447,15 +443,14 @@
                 let correct = q.ans;
                 let isError = tempErrors.has(i);
                 let hasFirstWrong = firstWrongAnswers.hasOwnProperty(i);
-                let isCorrected = hasFirstWrong && !isError; // 曾经错误且现已改正
-
+                let isCorrected = hasFirstWrong && !isError;
                 let displayVal = u;
                 let suffix = '';
                 if (isCorrected) {
-                    displayVal = firstWrongAnswers[i]; // 算式中显示第一次错误答案
+                    displayVal = firstWrongAnswers[i];
                     suffix = ` <span class="correction">△:${correct}</span>`;
                 } else if (isError) {
-                    displayVal = u; // 当前错误答案
+                    displayVal = u;
                     suffix = ` <span class="wrong-mark">✗</span>`;
                 } else if (u !== '') {
                     suffix = ' ✓';
