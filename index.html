@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（完善版）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（静默下载版）</title>
     <style>
         :root {
             --bg: #fdf8f3; --card-bg: #ffffff; --primary: #4a90d9; --accent: #f6a623;
@@ -87,16 +87,16 @@
             .page-header h2 { font-size:16pt; }
             .info-line { font-size:9pt; display:flex; justify-content:center; gap:10mm; }
             .day-block { flex:1; display:flex; flex-direction:column; }
-            .day-block + .day-block { margin-top: 4mm; } /* 恢复间距 */
+            .day-block + .day-block { margin-top: 4mm; }
             .day-title { font-size:10pt; font-weight:bold; border-bottom:1px dashed #000; padding-bottom:1.5mm; margin-bottom:2mm; }
             .questions-grid-print { display:grid; grid-template-columns:repeat(4,1fr); gap:3mm 6mm; flex:1; }
             .q-item { font-size:10pt; white-space:nowrap; line-height:1.8; }
         }
 
-        /* 导出容器（隐藏，用于截图） */
+        /* 导出容器 */
         #exportContainer {
             position: absolute; left: -9999px; top: 0;
-            width: 1000px; /* 足够宽，防止裁剪 */
+            width: 1000px;
         }
         .export-page {
             padding: 20px; background: #fff; font-family: 'KaiTi','楷体',sans-serif;
@@ -169,21 +169,16 @@
 </script>
 <script>
     (function() {
-        // 全局状态
         let currentQuestions = [], userAnswers = {}, firstWrongAnswers = {}, errorQuestions = new Set();
         let reviewMode = false, isSubmitted = false, activeIdx = -1, currentInput = '';
         let timerSec = 0, timerInterval = null, timerRunning = false;
         const MAX_LEN = 3;
 
-        // 姓名持久化
         const nameInput = document.getElementById('studentName');
-        const dateInput = document.getElementById('practiceDate');
-        // 加载本地存储的姓名
         const savedName = localStorage.getItem('oralMathName');
         if (savedName) nameInput.value = savedName;
         nameInput.addEventListener('input', () => localStorage.setItem('oralMathName', nameInput.value));
 
-        // 工具函数
         function rInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
         function noCarry(a,b){ return (a%10 + b%10 <10) && (Math.floor(a/10)+Math.floor(b/10)<10) && a+b<100; }
         function noBorrow(a,b){ return a>=b && (a%10 >= b%10) && (Math.floor(a/10) >= Math.floor(b/10)); }
@@ -328,7 +323,7 @@
             if(next<currentQuestions.length) activateQuestion(next);
             else {
                 hideKey(); window.scrollTo({top:0,behavior:'smooth'});
-                if(isSubmitted && errorQuestions.size===0) setTimeout(downloadImage,500); // 改错完成自动下载
+                if(isSubmitted && errorQuestions.size===0) setTimeout(downloadImage,500);
             }
         }
         function updatePreview(){ let p=document.getElementById('keyboardPreview'); p.textContent=currentInput||'___'; p.classList.toggle('empty',!currentInput); }
@@ -370,7 +365,7 @@
             sec.style.display=vis?'none':'block'; btn.classList.toggle('showing',!vis); btn.innerHTML=vis?'👁️ 显示答案':'🙈 隐藏答案';
         }
 
-        // 打印功能
+        // 打印
         function printMultiplePages(){
             let inp=document.getElementById('pageCountInput'); let pages=parseInt(inp.value)||1; if(pages>10) pages=10; inp.value=pages;
             let all=genSet(pages*100), html='';
@@ -388,12 +383,11 @@
             setTimeout(()=>{ window.print(); document.getElementById('printContainer').style.display='none'; },200);
         }
 
-        // 图片导出（独立批改）
+        // 图片导出
         function buildExport(){
             let name = document.getElementById('studentName').value || '未填';
             let date = document.getElementById('practiceDate').value || new Date().toISOString().slice(0,10);
             let time = document.getElementById('timerDisplay').textContent;
-            // 临时批改，不影响网页状态
             let tempErrors = new Set();
             let tempFirstWrong = {};
             currentQuestions.forEach((q,i)=>{
@@ -401,7 +395,7 @@
                 if(u !== undefined && u !== '' && parseInt(u) !== q.ans){
                     tempErrors.add(i);
                     if(isSubmitted && firstWrongAnswers.hasOwnProperty(i)) tempFirstWrong[i] = firstWrongAnswers[i];
-                    else tempFirstWrong[i] = u; // 未交卷则以当前答案为第一次错误
+                    else tempFirstWrong[i] = u;
                 }
             });
 
@@ -414,7 +408,7 @@
                 let correct = q.ans;
                 let isWrong = tempErrors.has(i);
                 let first = tempFirstWrong[i];
-                let hasCorrection = first && !isWrong && u === String(correct); // 曾经错现在正确
+                let hasCorrection = first && !isWrong && u === String(correct);
                 let str = qStr(q, u);
                 let suffix = '';
                 if(hasCorrection) suffix = ` <span class="wrong-mark">${first}</span><span class="correction">△:${correct}</span>`;
@@ -426,21 +420,25 @@
             return html;
         }
 
-        function downloadImage(){
+        async function downloadImage(){
             let container = document.getElementById('exportContainer');
             container.innerHTML = buildExport();
             container.style.display = 'block';
-            setTimeout(async () => {
-                let el = container.querySelector('.export-page');
-                // 动态调整容器宽度以适应内容
-                let canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', logging: false });
-                let date = document.getElementById('practiceDate').value || new Date().toISOString().slice(0,10);
+            await new Promise(resolve => setTimeout(resolve, 300));
+            let el = container.querySelector('.export-page');
+            let canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', logging: false });
+            container.style.display = 'none';
+            let date = document.getElementById('practiceDate').value || new Date().toISOString().slice(0,10);
+            canvas.toBlob(function(blob) {
+                let url = URL.createObjectURL(blob);
                 let link = document.createElement('a');
+                link.href = url;
                 link.download = `${date}_口算练习.png`;
-                link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
                 link.click();
-                container.style.display = 'none';
-            }, 300);
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 'image/png');
         }
 
         function generateQuestions(){
@@ -450,7 +448,6 @@
             renderAnswers(qs);
         }
 
-        // 键盘事件
         document.addEventListener('keydown',function(e){
             if(activeIdx<0) return;
             if(e.key>='0'&&e.key<='9'){ e.preventDefault(); digit(e.key); }
