@@ -451,7 +451,7 @@
         }
 
         function printMultiplePages(){
-            let inp=document.getElementById('pageCountInput'); let pages=parseInt(inp.value)||1; if(pages>10) pages=10; inp.value=pages;
+            let inp=document.getElementById('pageCountInput'); let pages=parseInt(inp.value)||1; if(pages>30) pages=10; inp.value=pages;
             let all=genSet(pages*100), html='';
             for(let p=0;p<pages;p++){
                 let start=p*100, qs=all.slice(start,start+100), d1=qs.slice(0,50), d2=qs.slice(50,100);
