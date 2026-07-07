@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（A4满版）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（打印完美满版）</title>
     <style>
         :root {
             --bg: #fdf8f3;
@@ -303,29 +303,30 @@
             #printContainer { display: block !important; }
             @page {
                 size: A4;
-                margin: 8mm 7mm 8mm 7mm;   /* 适当减小边距，给内容更多空间 */
+                /* 关键：左侧增加边距，防止序号被裁切 */
+                margin: 8mm 8mm 8mm 14mm;
             }
         }
 
-        /* ========== 打印页样式（每页100题，2天量） ========== */
+        /* ========== 打印页样式（满版、序号可见） ========== */
         .print-page {
             page-break-after: always;
             font-family: 'KaiTi', 'STKaiti', '楷体', 'Noto Sans SC', sans-serif;
             color: #000;
-            padding: 0 1mm;
+            padding: 0 2mm 0 4mm;   /* 增加左内边距辅助显示序号 */
             display: flex;
             flex-direction: column;
-            height: 100%;            /* 尽量撑满打印区域 */
+            height: 100%;            /* 尽可能撑满打印区域 */
         }
         .print-page:last-child { page-break-after: auto; }
 
         .page-header {
             text-align: center;
-            margin-bottom: 3mm;
+            margin-bottom: 4mm;
         }
         .page-header h2 {
             font-size: 16pt;
-            margin: 0 0 2mm;
+            margin: 0 0 3mm;
             letter-spacing: 2px;
         }
         .info-line {
@@ -333,49 +334,50 @@
             color: #222;
             display: flex;
             justify-content: center;
-            gap: 10mm;
-            margin-bottom: 2mm;
+            gap: 12mm;
+            margin-bottom: 3mm;
             font-weight: 500;
         }
 
-        /* 两个天块之间用稍微明显的分隔 */
+        /* 两个天块平分剩余高度，填满整页 */
         .day-block {
-            margin-bottom: 2.5mm;
-            page-break-inside: avoid;
-            flex: 1;                /* 让两个天块均分剩余高度 */
+            flex: 1;
             display: flex;
             flex-direction: column;
+            margin-bottom: 0;       /* 不再有额外下边距 */
         }
         .day-title {
             font-size: 10.5pt;
             font-weight: bold;
             border-bottom: 1px dashed #000;
-            padding-bottom: 1mm;
-            margin-bottom: 2mm;
+            padding-bottom: 2mm;
+            margin-bottom: 3mm;
             text-align: left;
         }
 
-        /* 核心：5列网格，紧凑但清晰的间距 */
+        /* 5列网格，适当加大行距和列距，使内容均匀分布 */
         .questions-grid-print {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 2.5mm 5mm;        /* 行距2.5mm，列距5mm */
+            gap: 5.5mm 7mm;        /* 行距5.5mm，列距7mm，让行高增加 */
             flex: 1;
         }
         .q-item {
-            font-size: 9.5pt;       /* 适中字号，保证可读 */
+            font-size: 10pt;        /* 稍微增大字体，提升可读性 */
             white-space: nowrap;
-            line-height: 1.9;       /* 行高紧凑但不拥挤 */
-            letter-spacing: 0.3px;
+            line-height: 2.4;       /* 配合gap，让每行更高，填满垂直空间 */
+            letter-spacing: 0.4px;
+            padding-left: 2mm;      /* 额外的左内边距，确保序号不被遮挡 */
         }
 
-        /* 针对小算式可能换行的情况，允许缩小间距 */
+        /* 针对超窄打印机的小幅调整 */
         @media print and (max-width: 210mm) {
             .questions-grid-print {
-                gap: 2mm 4mm;
+                gap: 4.5mm 5mm;
             }
             .q-item {
-                font-size: 9pt;
+                font-size: 9.5pt;
+                line-height: 2.2;
             }
         }
     </style>
@@ -427,7 +429,7 @@
                 return { tens: Math.floor(n / 10), ones: n % 10 };
             }
 
-            // ========== 生成规则 ==========
+            // ========== 生成规则（不变） ==========
             function generateNoCarryAddition() {
                 for (let i = 0; i < 200; i++) {
                     const a = randInt(3, 85);
@@ -654,7 +656,7 @@
 
                 document.getElementById('printContainer').innerHTML = printHTML;
 
-                // 若屏幕答案显示中，先关闭
+                // 如果屏幕答案正在显示，先关闭
                 if (document.getElementById('answersSection').classList.contains('visible')) {
                     toggleAnswers();
                 }
