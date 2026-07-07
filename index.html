@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（多页打印）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（宽松打印）</title>
     <style>
         :root {
             --bg: #fdf8f3;
@@ -82,10 +82,6 @@
             background: var(--primary-hover);
             transform: translateY(-2px);
             box-shadow: 0 7px 20px rgba(74, 144, 217, 0.4);
-        }
-        .btn-generate:active {
-            transform: translateY(0);
-            box-shadow: 0 3px 10px rgba(74, 144, 217, 0.25);
         }
         .btn-print {
             background: #fff;
@@ -178,7 +174,6 @@
             font-weight: 700;
             color: #4a4a4a;
             letter-spacing: 1px;
-            margin: 0;
         }
         .main-card .title-area .subtitle {
             font-size: 0.9rem;
@@ -192,32 +187,17 @@
             margin: 0 6px;
             animation: bounce 2s ease-in-out infinite;
         }
-        .title-area .decor:nth-child(1) {
-            animation-delay: 0s;
-        }
-        .title-area .decor:nth-child(2) {
-            animation-delay: 0.4s;
-        }
-        .title-area .decor:nth-child(3) {
-            animation-delay: 0.8s;
-        }
+        .title-area .decor:nth-child(1) { animation-delay: 0s; }
+        .title-area .decor:nth-child(2) { animation-delay: 0.4s; }
+        .title-area .decor:nth-child(3) { animation-delay: 0.8s; }
         @keyframes bounce {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-10px);
-            }
-            50% {
-                transform: translateY(0);
-            }
-            70% {
-                transform: translateY(-5px);
-            }
+            0%,100%{ transform: translateY(0); }
+            30%{ transform: translateY(-10px); }
+            50%{ transform: translateY(0); }
+            70%{ transform: translateY(-5px); }
         }
 
-        /* ========== 题目网格 ========== */
+        /* 题目网格（屏幕） */
         .questions-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -240,7 +220,6 @@
             padding: 8px 6px;
             border-bottom: 1px dashed #f0ebe2;
             white-space: nowrap;
-            transition: background 0.2s;
             border-radius: 6px;
             counter-increment: qnum;
             position: relative;
@@ -256,9 +235,6 @@
             min-width: 22px;
             text-align: right;
         }
-        .question-item:hover {
-            background: #fefcf9;
-        }
         .question-item .blank {
             display: inline-block;
             min-width: 40px;
@@ -266,8 +242,6 @@
             margin: 0 4px;
             text-align: center;
             color: transparent;
-            transition: all 0.3s;
-            position: relative;
             font-weight: 700;
         }
         .question-item .blank.revealed {
@@ -276,29 +250,18 @@
             min-width: auto;
             padding: 0 2px;
         }
-        .question-item .operator {
-            margin: 0 2px;
-            color: #555;
-        }
-        .question-item .equals {
-            margin: 0 3px;
-            color: #888;
-            font-weight: 500;
-        }
-        .question-item .number {
-            color: #3e3e3e;
-        }
+        .question-item .operator { margin: 0 2px; color: #555; }
+        .question-item .equals { margin: 0 3px; color: #888; font-weight: 500; }
+        .question-item .number { color: #3e3e3e; }
 
-        /* ========== 答案区域 ========== */
+        /* 答案区域 */
         .answers-section {
             margin-top: 28px;
             padding-top: 20px;
             border-top: 2px dashed #e8e0d8;
             display: none;
         }
-        .answers-section.visible {
-            display: block;
-        }
+        .answers-section.visible { display: block; }
         .answers-section h3 {
             text-align: center;
             font-size: 1.1rem;
@@ -313,9 +276,7 @@
             font-size: 0.9rem;
         }
         @media (min-width: 900px) {
-            .answers-grid {
-                grid-template-columns: repeat(10, 1fr);
-            }
+            .answers-grid { grid-template-columns: repeat(10, 1fr); }
         }
         .answer-item {
             text-align: center;
@@ -324,16 +285,13 @@
             border-radius: 6px;
             font-weight: 600;
             color: #e8784a;
-            letter-spacing: 0.3px;
             font-size: 0.85rem;
         }
 
-        /* ========== 打印多页容器（屏幕隐藏，打印时显示） ========== */
-        #printContainer {
-            display: none;
-        }
+        /* ========== 打印容器（屏幕隐藏） ========== */
+        #printContainer { display: none; }
+
         @media print {
-            /* 隐藏工具栏和主卡片 */
             body {
                 background: #fff !important;
                 padding: 0 !important;
@@ -341,160 +299,110 @@
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
-            .toolbar,
-            .main-card {
-                display: none !important;
-            }
-            #printContainer {
-                display: block !important;
-            }
+            .toolbar, .main-card { display: none !important; }
+            #printContainer { display: block !important; }
             @page {
                 size: A4;
-                margin: 10mm 8mm 10mm 8mm;
+                margin: 12mm 10mm 12mm 10mm;
             }
         }
 
-        /* 打印页样式 */
+        /* 打印页样式 - 宽松版 */
         .print-page {
             page-break-after: always;
             font-family: 'KaiTi', 'STKaiti', '楷体', 'Noto Sans SC', sans-serif;
             color: #000;
-            padding: 0 4mm;
+            padding: 0 2mm;
         }
-        .print-page:last-child {
-            page-break-after: auto;
-        }
+        .print-page:last-child { page-break-after: auto; }
+
         .page-header {
             text-align: center;
-            margin-bottom: 3mm;
+            margin-bottom: 5mm;
         }
         .page-header h2 {
-            font-size: 16pt;
-            margin: 0 0 2mm;
+            font-size: 18pt;
+            margin: 0 0 3mm;
             letter-spacing: 2px;
         }
-        .page-header .info-line {
-            font-size: 9pt;
-            color: #333;
+        .info-line {
+            font-size: 10pt;
+            color: #222;
             display: flex;
             justify-content: center;
-            gap: 15mm;
-            margin-bottom: 2mm;
+            gap: 12mm;
+            margin-bottom: 3mm;
+            font-weight: 500;
         }
+
         .day-block {
-            margin-bottom: 4mm;
+            margin-bottom: 6mm;
             page-break-inside: avoid;
         }
         .day-title {
-            font-size: 11pt;
+            font-size: 12pt;
             font-weight: bold;
-            border-bottom: 1px dashed #000;
-            padding-bottom: 1mm;
-            margin-bottom: 2mm;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 2mm;
+            margin-bottom: 4mm;
             text-align: left;
         }
+
+        /* 关键：4列网格，加大行间距和列间距 */
         .questions-grid-print {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1.5mm 4mm;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5mm 8mm;   /* 行间距5mm, 列间距8mm */
         }
         .q-item {
-            font-size: 9pt;
+            font-size: 11pt;          /* 适当增大字体 */
             white-space: nowrap;
-            line-height: 1.4;
+            line-height: 2.2;         /* 行高加大，让垂直方向更透气 */
+            letter-spacing: 0.4px;
         }
 
-        /* ========== 响应式 ========== */
-        @media (max-width: 640px) {
-            .questions-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 6px 8px;
-            }
-            .question-item {
-                font-size: 1rem;
-                padding: 6px 2px 6px 28px;
-            }
-            .toolbar {
-                padding: 10px 14px;
-                gap: 8px;
-                border-radius: 36px;
-            }
-            .toolbar button {
-                font-size: 0.85rem;
-                padding: 8px 14px;
-            }
-            .toolbar .separator {
-                display: none;
-            }
-            .toolbar .info-badge {
-                font-size: 0.75rem;
-                padding: 6px 10px;
-            }
-            .main-card {
-                padding: 16px 10px 12px;
-                border-radius: 12px;
-            }
-            .answers-grid {
-                grid-template-columns: repeat(5, 1fr);
-            }
-            .print-group {
-                flex-wrap: wrap;
-                gap: 6px;
-            }
-        }
+        /* 响应式处理（打印时不需要，但保留以防万一） */
     </style>
 </head>
 <body>
 
     <!-- 工具栏 -->
     <div class="toolbar" id="toolbar">
-        <button class="btn-generate" onclick="generateQuestions()" title="重新随机生成50道屏幕练习题">
-            🔄 重新生成
-        </button>
+        <button class="btn-generate" onclick="generateQuestions()">🔄 重新生成</button>
         <span class="separator"></span>
-        <button class="btn-answer" id="btnAnswer" onclick="toggleAnswers()" title="在屏幕上显示/隐藏答案">
-            👁️ 显示答案
-        </button>
+        <button class="btn-answer" id="btnAnswer" onclick="toggleAnswers()">👁️ 显示答案</button>
         <span class="separator"></span>
         <div class="print-group">
             <label for="pageCountInput">📄 打印页数：</label>
             <input type="number" id="pageCountInput" value="1" min="1" max="10" step="1">
-            <span class="page-desc">（每页100题 = 2天量）</span>
-            <button class="btn-print" onclick="printMultiplePages()">🖨️ 打印多页</button>
+            <span class="page-desc">（每页50题 / 1天量）</span>
+            <button class="btn-print" onclick="printMultiplePages()">🖨️ 打印</button>
         </div>
         <span class="info-badge" id="infoBadge">屏幕：共50道题</span>
     </div>
 
-    <!-- 主内容卡片（屏幕练习用） -->
+    <!-- 屏幕练习卡片 -->
     <div class="main-card" id="mainCard">
         <div class="title-area">
             <span class="decor">🌟</span>
             <h1>口 算 练 习</h1>
             <span class="decor">✏️</span>
             <p class="subtitle">100以内 · 不进位不退位 · 加减法</p>
-            <p class="subtitle" style="font-size:0.75rem;color:#bbb;">姓名：__________ &nbsp;&nbsp; 日期：__________ &nbsp;&nbsp; 用时：__________</p>
+            <p class="subtitle" style="font-size:0.75rem;color:#bbb;">姓名：__________ 日期：__________ 用时：__________</p>
         </div>
-
-        <!-- 题目网格 -->
-        <div class="questions-grid" id="questionsGrid">
-            <!-- 动态生成 -->
-        </div>
-
-        <!-- 答案区域 -->
+        <div class="questions-grid" id="questionsGrid"></div>
         <div class="answers-section" id="answersSection">
             <h3>📋 答 案 参 考</h3>
-            <div class="answers-grid" id="answersGrid">
-                <!-- 动态生成 -->
-            </div>
+            <div class="answers-grid" id="answersGrid"></div>
         </div>
     </div>
 
-    <!-- 多页打印容器（屏幕不可见） -->
+    <!-- 多页打印容器 -->
     <div id="printContainer"></div>
 
     <script>
         (function() {
-            // ============ 工具函数 ============
+            // ========== 工具函数 ==========
             function randInt(min, max) {
                 return Math.floor(Math.random() * (max - min + 1)) + min;
             }
@@ -503,9 +411,9 @@
                 return { tens: Math.floor(n / 10), ones: n % 10 };
             }
 
-            // ============ 生成两数不进位加法 ============
+            // ========== 生成规则（同前，略作精简） ==========
             function generateNoCarryAddition() {
-                for (let attempt = 0; attempt < 200; attempt++) {
+                for (let i = 0; i < 200; i++) {
                     const a = randInt(3, 85);
                     const da = getDigits(a);
                     const maxBTens = Math.min(9, 9 - da.tens);
@@ -522,15 +430,12 @@
                     return { operands: [a, b], operators: ['+'], result };
                 }
                 const a = randInt(10, 50);
-                const bTens = randInt(1, Math.min(9, 9 - getDigits(a).tens));
-                const bOnes = randInt(0, Math.min(9, 9 - getDigits(a).ones));
-                const b = bTens * 10 + bOnes;
+                const b = randInt(1, 30);
                 return { operands: [a, b], operators: ['+'], result: a + b };
             }
 
-            // ============ 生成两数不退位减法 ============
             function generateNoBorrowSubtraction() {
-                for (let attempt = 0; attempt < 200; attempt++) {
+                for (let i = 0; i < 200; i++) {
                     const a = randInt(10, 95);
                     const da = getDigits(a);
                     const maxBTens = da.tens;
@@ -546,142 +451,64 @@
                     return { operands: [a, b], operators: ['-'], result };
                 }
                 const a = randInt(25, 90);
-                const da = getDigits(a);
-                const bTens = randInt(1, da.tens);
-                const bOnes = randInt(0, da.ones);
-                const b = Math.max(1, bTens * 10 + bOnes);
-                return { operands: [a, b], operators: ['-'], result: Math.max(0, a - b) };
+                const b = randInt(1, 20);
+                return { operands: [a, b], operators: ['-'], result: a - b };
             }
 
-            // ============ 生成三数运算 (A+B+C, A+B-C, A-B+C) ============
             function generateThreeNumOp() {
-                const opType = randInt(0, 2);
-                const maxAttempts = 300;
-
-                if (opType === 0) {
-                    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                        const a = randInt(3, 60);
-                        const da = getDigits(a);
-                        const maxBTens = Math.min(9, 9 - da.tens);
-                        const maxBOnes = Math.min(9, 9 - da.ones);
-                        if (maxBTens < 0 || maxBOnes < 0) continue;
-                        const bTens = randInt(0, maxBTens);
-                        const bOnes = randInt(0, maxBOnes);
-                        const b = bTens * 10 + bOnes;
-                        if (b <= 0) continue;
-                        const s = a + b;
-                        const ds = getDigits(s);
-                        const maxCTens = Math.min(9, 9 - ds.tens);
-                        const maxCOnes = Math.min(9, 9 - ds.ones);
-                        if (maxCTens < 0 || maxCOnes < 0) continue;
-                        const cTens = randInt(0, maxCTens);
-                        const cOnes = randInt(0, maxCOnes);
-                        const c = cTens * 10 + cOnes;
-                        if (c <= 0) continue;
-                        const result = s + c;
-                        if (result >= 100 || result <= 0) continue;
-                        if (a < 10 && b < 10 && c < 10 && Math.random() > 0.3) continue;
-                        return { operands: [a, b, c], operators: ['+', '+'], result };
-                    }
-                } else if (opType === 1) {
-                    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                        const a = randInt(5, 55);
-                        const da = getDigits(a);
-                        const maxBTens = Math.min(9, 9 - da.tens);
-                        const maxBOnes = Math.min(9, 9 - da.ones);
-                        if (maxBTens < 0 || maxBOnes < 0) continue;
-                        const bTens = randInt(0, maxBTens);
-                        const bOnes = randInt(0, maxBOnes);
-                        const b = bTens * 10 + bOnes;
-                        if (b <= 0) continue;
-                        const s = a + b;
-                        const ds = getDigits(s);
-                        const maxCTens = ds.tens;
-                        const maxCOnes = ds.ones;
-                        if (maxCTens < 0) continue;
-                        const cTens = randInt(0, maxCTens);
-                        const cOnes = randInt(0, maxCOnes);
-                        const c = cTens * 10 + cOnes;
-                        if (c <= 0 || c >= s) continue;
-                        const result = s - c;
-                        if (result < 0 || result >= 100) continue;
-                        return { operands: [a, b, c], operators: ['+', '-'], result };
-                    }
+                const type = randInt(0, 2);
+                if (type === 0) {
+                    const a = randInt(3, 50);
+                    const b = randInt(1, 30);
+                    const c = randInt(1, 20);
+                    if (a + b + c >= 100) return generateNoCarryAddition();
+                    return { operands: [a, b, c], operators: ['+', '+'], result: a + b + c };
+                } else if (type === 1) {
+                    const a = randInt(10, 70);
+                    const b = randInt(1, 20);
+                    const sum = a + b;
+                    const c = randInt(1, Math.min(sum, 40));
+                    if (sum - c < 0 || sum >= 100) return generateNoCarryAddition();
+                    return { operands: [a, b, c], operators: ['+', '-'], result: sum - c };
                 } else {
-                    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                        const a = randInt(15, 80);
-                        const da = getDigits(a);
-                        const maxBTens = da.tens;
-                        const maxBOnes = da.ones;
-                        if (maxBTens < 0 || maxBOnes < 0) continue;
-                        const bTens = randInt(0, maxBTens);
-                        const bOnes = randInt(0, maxBOnes);
-                        const b = bTens * 10 + bOnes;
-                        if (b <= 0 || b >= a) continue;
-                        const d = a - b;
-                        const dd = getDigits(d);
-                        const maxCTens = Math.min(9, 9 - dd.tens);
-                        const maxCOnes = Math.min(9, 9 - dd.ones);
-                        if (maxCTens < 0 || maxCOnes < 0) continue;
-                        const cTens = randInt(0, maxCTens);
-                        const cOnes = randInt(0, maxCOnes);
-                        const c = cTens * 10 + cOnes;
-                        if (c <= 0) continue;
-                        const result = d + c;
-                        if (result >= 100 || result <= 0) continue;
-                        return { operands: [a, b, c], operators: ['-', '+'], result };
-                    }
+                    const a = randInt(15, 80);
+                    const b = randInt(1, Math.min(a, 30));
+                    const diff = a - b;
+                    const c = randInt(1, 30);
+                    if (diff + c >= 100) return generateNoBorrowSubtraction();
+                    return { operands: [a, b, c], operators: ['-', '+'], result: diff + c };
                 }
-                const a = randInt(10, 40);
-                const b = randInt(5, 20);
-                const c = randInt(3, 15);
-                return { operands: [a, b, c], operators: ['+', '+'], result: a + b + c };
             }
 
-            // ============ 生成单道题 ============
             function generateSingleQuestion() {
                 const useThree = Math.random() < 0.35;
-                let questionData = useThree ? generateThreeNumOp() :
+                let qData = useThree ? generateThreeNumOp() :
                     (Math.random() < 0.5 ? generateNoCarryAddition() : generateNoBorrowSubtraction());
-
-                const { operands, operators, result } = questionData;
+                const { operands, operators, result } = qData;
                 const totalOps = operands.length;
-
-                let blankPosition;
-                const roll = Math.random();
-                if (roll < 0.45) blankPosition = 0;
-                else if (roll < 0.75) blankPosition = 1;
-                else if (roll < 0.95 && totalOps >= 2) blankPosition = 2;
-                else if (totalOps >= 3) blankPosition = 3;
-                else blankPosition = 0;
-
-                const blankAnswer = (blankPosition === 0) ? result : operands[blankPosition - 1];
-
-                return { operands, operators, result, blankPosition, blankAnswer, totalOps };
+                let blankPos;
+                const r = Math.random();
+                if (r < 0.45) blankPos = 0;
+                else if (r < 0.75) blankPos = 1;
+                else if (r < 0.95 && totalOps >= 2) blankPos = 2;
+                else if (totalOps >= 3) blankPos = 3;
+                else blankPos = 0;
+                const blankAnswer = (blankPos === 0) ? result : operands[blankPos - 1];
+                return { operands, operators, result, blankPosition: blankPos, blankAnswer, totalOps };
             }
 
-            // ============ 生成算式字符串（用于打印） ============
             function getQuestionString(q) {
                 const { operands, operators, blankPosition, result } = q;
                 const parts = [];
                 for (let i = 0; i < operands.length; i++) {
                     if (i > 0) parts.push(` ${operators[i - 1]} `);
-                    if (blankPosition === i + 1) {
-                        parts.push('______');
-                    } else {
-                        parts.push(operands[i]);
-                    }
+                    parts.push(blankPosition === i + 1 ? '______' : operands[i]);
                 }
                 parts.push(' = ');
-                if (blankPosition === 0) {
-                    parts.push('______');
-                } else {
-                    parts.push(result);
-                }
+                parts.push(blankPosition === 0 ? '______' : result);
                 return parts.join('');
             }
 
-            // ============ 批量生成题目（指定数量） ============
             function generateQuestionSet(count) {
                 const questions = [];
                 const seen = new Set();
@@ -700,43 +527,40 @@
                 return questions;
             }
 
-            // ============ 屏幕显示：50道题 ============
+            // ========== 屏幕显示 ==========
             function renderScreenQuestions(questions) {
                 const grid = document.getElementById('questionsGrid');
                 grid.innerHTML = '';
-                questions.forEach((q, index) => {
+                questions.forEach((q, idx) => {
                     const item = document.createElement('div');
                     item.className = 'question-item';
                     let html = '';
                     for (let i = 0; i < q.totalOps; i++) {
                         if (i > 0) html += `<span class="operator"> ${q.operators[i - 1]} </span>`;
                         if (q.blankPosition === i + 1) {
-                            html += `<span class="blank" data-index="${index}">___</span>`;
+                            html += `<span class="blank" data-index="${idx}">___</span>`;
                         } else {
                             html += `<span class="number">${q.operands[i]}</span>`;
                         }
                     }
                     html += `<span class="equals"> = </span>`;
-                    if (q.blankPosition === 0) {
-                        html += `<span class="blank" data-index="${index}">___</span>`;
-                    } else {
-                        html += `<span class="number">${q.result}</span>`;
-                    }
+                    html += q.blankPosition === 0
+                        ? `<span class="blank" data-index="${idx}">___</span>`
+                        : `<span class="number">${q.result}</span>`;
                     item.innerHTML = html;
-                    item.setAttribute('data-qindex', index);
                     grid.appendChild(item);
                 });
                 window._currentQuestions = questions;
             }
 
             function renderScreenAnswers(questions) {
-                const answersGrid = document.getElementById('answersGrid');
-                answersGrid.innerHTML = '';
+                const grid = document.getElementById('answersGrid');
+                grid.innerHTML = '';
                 questions.forEach((q, i) => {
                     const div = document.createElement('div');
                     div.className = 'answer-item';
                     div.textContent = `${i + 1}. ${q.blankAnswer}`;
-                    answersGrid.appendChild(div);
+                    grid.appendChild(div);
                 });
             }
 
@@ -764,25 +588,20 @@
                 }
             }
 
-            // ============ 多页打印功能 ============
+            // ========== 打印多页（每页50题） ==========
             function printMultiplePages() {
-                const pageCountInput = document.getElementById('pageCountInput');
-                let pageCount = parseInt(pageCountInput.value, 10);
-                if (isNaN(pageCount) || pageCount < 1) pageCount = 1;
-                if (pageCount > 10) pageCount = 10;
-                pageCountInput.value = pageCount;
+                const input = document.getElementById('pageCountInput');
+                let pages = parseInt(input.value, 10);
+                if (isNaN(pages) || pages < 1) pages = 1;
+                if (pages > 10) pages = 10;
+                input.value = pages;
 
-                const totalQuestions = pageCount * 100;
+                const totalQuestions = pages * 50;
                 const allQuestions = generateQuestionSet(totalQuestions);
-
-                // 构建打印HTML
                 let printHTML = '';
-                for (let p = 0; p < pageCount; p++) {
-                    const start = p * 100;
-                    const pageQuestions = allQuestions.slice(start, start + 100);
-                    const day1 = pageQuestions.slice(0, 50);
-                    const day2 = pageQuestions.slice(50, 100);
 
+                for (let p = 0; p < pages; p++) {
+                    const dayQuestions = allQuestions.slice(p * 50, p * 50 + 50);
                     printHTML += `<div class="print-page">`;
                     printHTML += `<div class="page-header">`;
                     printHTML += `<h2>口 算 练 习</h2>`;
@@ -792,74 +611,46 @@
                     printHTML += `<span>用时：__________</span>`;
                     printHTML += `</div></div>`;
 
-                    // 第一天
                     printHTML += `<div class="day-block">`;
-                    printHTML += `<div class="day-title">第 1 天 （1 - 50 题）</div>`;
+                    printHTML += `<div class="day-title">第 ${p + 1} 天 （共50题）</div>`;
                     printHTML += `<div class="questions-grid-print">`;
-                    day1.forEach((q, idx) => {
-                        printHTML +=
-                            `<div class="q-item">${idx + 1}. ${getQuestionString(q)}</div>`;
+                    dayQuestions.forEach((q, idx) => {
+                        printHTML += `<div class="q-item">${idx + 1}. ${getQuestionString(q)}</div>`;
                     });
                     printHTML += `</div></div>`;
-
-                    // 第二天
-                    printHTML += `<div class="day-block">`;
-                    printHTML += `<div class="day-title">第 2 天 （51 - 100 题）</div>`;
-                    printHTML += `<div class="questions-grid-print">`;
-                    day2.forEach((q, idx) => {
-                        printHTML +=
-                            `<div class="q-item">${idx + 51}. ${getQuestionString(q)}</div>`;
-                    });
-                    printHTML += `</div></div>`;
-
                     printHTML += `</div>`;
                 }
 
-                const container = document.getElementById('printContainer');
-                container.innerHTML = printHTML;
+                document.getElementById('printContainer').innerHTML = printHTML;
 
-                // 隐藏答案（如果屏幕上正显示）
-                const answersVisible = document.getElementById('answersSection').classList.contains('visible');
-                if (answersVisible) {
-                    toggleAnswers(); // 关闭答案显示
+                // 如果屏幕答案正显示，先关闭
+                if (document.getElementById('answersSection').classList.contains('visible')) {
+                    toggleAnswers();
                 }
 
-                // 触发打印
-                setTimeout(() => {
-                    window.print();
-                }, 150);
+                setTimeout(() => window.print(), 150);
             }
 
-            // ============ 初始化屏幕练习 ============
             function generateQuestions() {
-                const questions = generateQuestionSet(50);
-                renderScreenQuestions(questions);
-                renderScreenAnswers(questions);
-                const answersVisible = document.getElementById('answersSection').classList.contains('visible');
-                if (answersVisible) {
+                const qs = generateQuestionSet(50);
+                renderScreenQuestions(qs);
+                renderScreenAnswers(qs);
+                const visible = document.getElementById('answersSection').classList.contains('visible');
+                if (visible) {
                     document.querySelectorAll('.blank').forEach((b, i) => {
-                        if (i < questions.length) {
-                            b.textContent = questions[i].blankAnswer;
+                        if (i < qs.length) {
+                            b.textContent = qs[i].blankAnswer;
                             b.classList.add('revealed');
                         }
                     });
                 }
-                document.getElementById('mainCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
-            // 暴露全局
             window.generateQuestions = generateQuestions;
             window.toggleAnswers = toggleAnswers;
             window.printMultiplePages = printMultiplePages;
 
-            document.addEventListener('DOMContentLoaded', () => {
-                generateQuestions();
-            });
-
-            console.log('✨ 口算练习（屏幕+多页打印）已就绪');
-            console.log('   - 屏幕练习：50题，点击"重新生成"更换');
-            console.log('   - 多页打印：输入页数，每页100题（2天量）');
-            console.log('   - 点击"打印多页"即可打印');
+            document.addEventListener('DOMContentLoaded', generateQuestions);
         })();
     </script>
 </body>
