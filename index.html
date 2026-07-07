@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（完美满版不超界）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（舒适满版打印）</title>
     <style>
         :root {
             --bg: #fdf8f3;
@@ -145,7 +145,7 @@
         .print-group input:focus { border-color: var(--primary); }
         .page-desc { font-size: 0.8rem; color: #999; }
 
-        /* 主卡片（屏幕） */
+        /* 主卡片（屏幕练习） */
         .main-card {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -285,12 +285,12 @@
             #printContainer { display: block !important; }
             @page {
                 size: A4;
-                /* 增加左右边距，防止内容被裁切 */
-                margin: 8mm 12mm 8mm 12mm;
+                /* 充足的左右边距，确保左侧算式完整显示 */
+                margin: 8mm 16mm 8mm 16mm;
             }
         }
 
-        /* 打印页样式（无序号，防超界） */
+        /* 打印页样式（4列，无序号，满版） */
         .print-page {
             page-break-after: always;
             font-family: 'KaiTi', 'STKaiti', '楷体', 'Noto Sans SC', sans-serif;
@@ -320,13 +320,13 @@
             margin-bottom: 2mm;
         }
 
-        /* 两个天块均分剩余高度，填满但不超界 */
+        /* 两个天块平分高度 */
         .day-block {
             flex: 1;
             display: flex;
             flex-direction: column;
             margin-bottom: 0;
-            overflow: hidden; /* 防止内容溢出 */
+            overflow: hidden;
         }
         .day-title {
             font-size: 10pt;
@@ -337,18 +337,18 @@
             text-align: left;
         }
 
-        /* 5列网格，精确控制间距与行高，确保100题刚好适配 */
+        /* 4列网格，间距更舒适 */
         .questions-grid-print {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 3.5mm 5mm;        /* 行距3.5mm，列距5mm */
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4mm 6mm;        /* 行距4mm，列距6mm，宽松不拥挤 */
             flex: 1;
         }
         .q-item {
-            font-size: 9.5pt;
+            font-size: 10pt;
             white-space: nowrap;
-            line-height: 1.8;      /* 减小行高，防止垂直溢出 */
-            letter-spacing: 0.3px;
+            line-height: 1.9;    /* 配合gap，使垂直分布均匀 */
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
