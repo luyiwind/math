@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（最终版）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（最终修正版）</title>
     <style>
         :root {
             --bg: #fdf8f3;
@@ -150,7 +150,6 @@
             flex-direction: column;
             overflow: hidden;
         }
-        /* 两个天块之间的间隔 */
         .day-block + .day-block {
             margin-top: 4mm;
         }
@@ -212,68 +211,110 @@
 <script>
     (function() {
         function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-        function getDigits(n) { return { tens: Math.floor(n / 10), ones: n % 10 }; }
 
+        // 检查两个数相加是否不进位（个位和<10，十位和<10，结果<100）
+        function isNoCarryAdd(a, b) {
+            if (a + b >= 100) return false;
+            const da = { tens: Math.floor(a / 10), ones: a % 10 };
+            const db = { tens: Math.floor(b / 10), ones: b % 10 };
+            return (da.ones + db.ones < 10) && (da.tens + db.tens < 10);
+        }
+
+        // 检查两个数相减是否不退位（个位差>=0，十位差>=0，结果>=0）
+        function isNoBorrowSub(a, b) {
+            if (a < b) return false;
+            const da = { tens: Math.floor(a / 10), ones: a % 10 };
+            const db = { tens: Math.floor(b / 10), ones: b % 10 };
+            return (da.ones >= db.ones) && (da.tens >= db.tens);
+        }
+
+        // 生成两数不进位加法
         function generateNoCarryAddition() {
             for (let i = 0; i < 200; i++) {
                 const a = randInt(3, 85);
-                const da = getDigits(a);
-                const maxBTens = Math.min(9, 9 - da.tens);
-                if (maxBTens < 0) continue;
-                const bTens = randInt(0, maxBTens);
-                const maxBOnes = Math.min(9, 9 - da.ones);
-                if (maxBOnes < 0) continue;
-                const bOnes = randInt(0, maxBOnes);
-                const b = bTens * 10 + bOnes;
-                if (b <= 0) continue;
-                const result = a + b;
-                if (result >= 100 || result <= 0) continue;
-                if (a < 10 && b < 10 && Math.random() > 0.35) continue;
-                return { operands: [a, b], operators: ['+'], result };
+                const maxB = Math.min(99 - a, 99);
+                if (maxB < 1) continue;
+                const b = randInt(1, maxB);
+                if (isNoCarryAdd(a, b) && a + b < 100 && a + b > 0) {
+                    return { operands: [a, b], operators: ['+'], result: a + b };
+                }
             }
-            const a = randInt(10, 50), b = randInt(1, 30);
+            // 兜底
+            const a = randInt(10, 40), b = randInt(1, 20);
             return { operands: [a, b], operators: ['+'], result: a + b };
         }
 
+        // 生成两数不退位减法
         function generateNoBorrowSubtraction() {
             for (let i = 0; i < 200; i++) {
                 const a = randInt(10, 95);
-                const da = getDigits(a);
-                const maxBTens = da.tens;
-                const maxBOnes = da.ones;
-                if (maxBTens < 0 || maxBOnes < 0) continue;
-                const bTens = randInt(0, maxBTens);
-                const bOnes = randInt(0, maxBOnes);
-                const b = bTens * 10 + bOnes;
-                if (b <= 0) continue;
-                const result = a - b;
-                if (result < 0 || a === b) continue;
-                if (a < 10 && b < 10 && Math.random() > 0.35) continue;
-                return { operands: [a, b], operators: ['-'], result };
+                const maxB = a;
+                if (maxB < 1) continue;
+                const b = randInt(1, maxB);
+                if (isNoBorrowSub(a, b) && a - b >= 0) {
+                    return { operands: [a, b], operators: ['-'], result: a - b };
+                }
             }
             const a = randInt(25, 90), b = randInt(1, 20);
             return { operands: [a, b], operators: ['-'], result: a - b };
         }
 
+        // 生成三个数的运算（严格检查中间步骤）
         function generateThreeNumOp() {
             const type = randInt(0, 2);
-            if (type === 0) {
-                const a = randInt(3, 50), b = randInt(1, 30), c = randInt(1, 20);
-                if (a + b + c >= 100) return generateNoCarryAddition();
-                return { operands: [a, b, c], operators: ['+', '+'], result: a + b + c };
-            } else if (type === 1) {
-                const a = randInt(10, 70), b = randInt(1, 20);
-                const sum = a + b;
-                const c = randInt(1, Math.min(sum, 40));
-                if (sum - c < 0 || sum >= 100) return generateNoCarryAddition();
-                return { operands: [a, b, c], operators: ['+', '-'], result: sum - c };
-            } else {
-                const a = randInt(15, 80), b = randInt(1, Math.min(a, 30));
-                const diff = a - b;
-                const c = randInt(1, 30);
-                if (diff + c >= 100) return generateNoBorrowSubtraction();
-                return { operands: [a, b, c], operators: ['-', '+'], result: diff + c };
+            for (let attempt = 0; attempt < 300; attempt++) {
+                if (type === 0) {
+                    // A + B + C
+                    const a = randInt(3, 70);
+                    const maxB = 99 - a;
+                    if (maxB < 1) continue;
+                    const b = randInt(1, maxB);
+                    if (!isNoCarryAdd(a, b)) continue;
+                    const sumAB = a + b;
+                    if (sumAB >= 100) continue;
+                    const maxC = 99 - sumAB;
+                    if (maxC < 1) continue;
+                    const c = randInt(1, maxC);
+                    if (!isNoCarryAdd(sumAB, c)) continue;
+                    const result = sumAB + c;
+                    if (result >= 100) continue;
+                    return { operands: [a, b, c], operators: ['+', '+'], result };
+                } else if (type === 1) {
+                    // A + B - C
+                    const a = randInt(5, 70);
+                    const maxB = 99 - a;
+                    if (maxB < 1) continue;
+                    const b = randInt(1, maxB);
+                    if (!isNoCarryAdd(a, b)) continue;
+                    const sumAB = a + b;
+                    if (sumAB >= 100) continue;
+                    const maxC = sumAB;
+                    if (maxC < 1) continue;
+                    const c = randInt(1, maxC);
+                    if (!isNoBorrowSub(sumAB, c)) continue;
+                    const result = sumAB - c;
+                    if (result < 0) continue;
+                    return { operands: [a, b, c], operators: ['+', '-'], result };
+                } else {
+                    // A - B + C
+                    const a = randInt(15, 90);
+                    const maxB = a;
+                    if (maxB < 1) continue;
+                    const b = randInt(1, maxB);
+                    if (!isNoBorrowSub(a, b)) continue;
+                    const diffAB = a - b;
+                    if (diffAB < 0) continue;
+                    const maxC = 99 - diffAB;
+                    if (maxC < 1) continue;
+                    const c = randInt(1, maxC);
+                    if (!isNoCarryAdd(diffAB, c)) continue;
+                    const result = diffAB + c;
+                    if (result >= 100) continue;
+                    return { operands: [a, b, c], operators: ['-', '+'], result };
+                }
             }
+            // 如果失败，返回一个安全的加法题
+            return generateNoCarryAddition();
         }
 
         function generateSingleQuestion() {
