@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（完美满版）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（最终版）</title>
     <style>
         :root {
             --bg: #fdf8f3;
@@ -14,7 +14,7 @@
             --text: #3e3e3e;
             --text-light: #6b6b6b;
             --border: #e8e0d8;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --shadow: 0 4px 20px rgba(0,0,0,0.06);
             --radius: 16px;
             --font-kid: 'Comic Sans MS', 'KaiTi', 'STKaiti', '楷体', 'Noto Sans SC', sans-serif;
         }
@@ -36,7 +36,6 @@
             align-items: center;
         }
 
-        /* 工具栏 */
         .toolbar {
             position: sticky;
             top: 16px;
@@ -69,83 +68,20 @@
             align-items: center;
             gap: 6px;
         }
-        .btn-generate {
-            background: var(--primary);
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(74,144,217,0.3);
-        }
-        .btn-generate:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(74,144,217,0.4);
-        }
-        .btn-print {
-            background: #fff;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-        .btn-print:hover {
-            background: #f0f7ff;
-            border-color: var(--primary-hover);
-            color: var(--primary-hover);
-            transform: translateY(-2px);
-        }
-        .btn-answer {
-            background: #fff;
-            color: var(--accent);
-            border: 2px solid var(--accent);
-        }
-        .btn-answer:hover {
-            background: #fffaf3;
-            border-color: #e8961a;
-            color: #e8961a;
-            transform: translateY(-2px);
-        }
-        .btn-answer.showing {
-            background: #fff8ee;
-            border-color: #e8961a;
-            color: #d4891a;
-            box-shadow: 0 0 0 4px rgba(246,166,35,0.12);
-        }
-        .toolbar .separator {
-            width: 1px;
-            height: 28px;
-            background: var(--border);
-            margin: 0 4px;
-            border-radius: 1px;
-        }
-        .toolbar .info-badge {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            background: #f9f6f1;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-        }
-        .print-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            color: var(--text-light);
-            font-weight: 500;
-        }
-        .print-group input {
-            font-family: inherit;
-            font-size: 0.9rem;
-            width: 55px;
-            padding: 6px 8px;
-            border: 2px solid var(--border);
-            border-radius: 20px;
-            text-align: center;
-            outline: none;
-            transition: border 0.2s;
-        }
+        .btn-generate { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(74,144,217,0.3); }
+        .btn-generate:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 7px 20px rgba(74,144,217,0.4); }
+        .btn-print { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-print:hover { background: #f0f7ff; border-color: var(--primary-hover); color: var(--primary-hover); transform: translateY(-2px); }
+        .btn-answer { background: #fff; color: var(--accent); border: 2px solid var(--accent); }
+        .btn-answer:hover { background: #fffaf3; border-color: #e8961a; color: #e8961a; transform: translateY(-2px); }
+        .btn-answer.showing { background: #fff8ee; border-color: #e8961a; color: #d4891a; box-shadow: 0 0 0 4px rgba(246,166,35,0.12); }
+        .toolbar .separator { width: 1px; height: 28px; background: var(--border); margin: 0 4px; border-radius: 1px; }
+        .toolbar .info-badge { font-size: 0.9rem; color: var(--text-light); background: #f9f6f1; padding: 8px 16px; border-radius: 50px; font-weight: 500; }
+        .print-group { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-light); font-weight: 500; }
+        .print-group input { font-family: inherit; font-size: 0.9rem; width: 55px; padding: 6px 8px; border: 2px solid var(--border); border-radius: 20px; text-align: center; outline: none; transition: border 0.2s; }
         .print-group input:focus { border-color: var(--primary); }
         .page-desc { font-size: 0.8rem; color: #999; }
 
-        /* 主卡片（屏幕） */
         .main-card {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -154,143 +90,46 @@
             padding: 32px 28px 24px;
             width: 100%;
             max-width: 1000px;
-            transition: 0.3s;
         }
         .main-card .title-area { text-align: center; margin-bottom: 24px; }
-        .main-card .title-area h1 {
-            font-size: 1.7rem;
-            font-weight: 700;
-            color: #4a4a4a;
-            letter-spacing: 1px;
-        }
-        .main-card .title-area .subtitle {
-            font-size: 0.9rem;
-            color: #999;
-            margin-top: 4px;
-            letter-spacing: 0.5px;
-        }
-        .title-area .decor {
-            display: inline-block;
-            font-size: 1.4rem;
-            margin: 0 6px;
-            animation: bounce 2s infinite;
-        }
+        .main-card .title-area h1 { font-size: 1.7rem; font-weight: 700; color: #4a4a4a; letter-spacing: 1px; }
+        .main-card .title-area .subtitle { font-size: 0.9rem; color: #999; margin-top: 4px; letter-spacing: 0.5px; }
+        .title-area .decor { display: inline-block; font-size: 1.4rem; margin: 0 6px; animation: bounce 2s infinite; }
         .title-area .decor:nth-child(1) { animation-delay: 0s; }
         .title-area .decor:nth-child(2) { animation-delay: 0.4s; }
         .title-area .decor:nth-child(3) { animation-delay: 0.8s; }
-        @keyframes bounce {
-            0%,100%{ transform: translateY(0); }
-            30%{ transform: translateY(-10px); }
-            50%{ transform: translateY(0); }
-            70%{ transform: translateY(-5px); }
-        }
+        @keyframes bounce { 0%,100%{ transform: translateY(0); } 30%{ transform: translateY(-10px); } 50%{ transform: translateY(0); } 70%{ transform: translateY(-5px); } }
 
-        .questions-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px 20px;
-            counter-reset: qnum;
-        }
-        @media (min-width: 900px) {
-            .questions-grid { grid-template-columns: repeat(3, 1fr); gap: 10px 24px; }
-        }
+        .questions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 20px; counter-reset: qnum; }
+        @media (min-width: 900px) { .questions-grid { grid-template-columns: repeat(3, 1fr); gap: 10px 24px; } }
         .question-item {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            font-size: 1.25rem;
-            font-weight: 600;
-            letter-spacing: 0.6px;
-            padding: 8px 6px;
-            border-bottom: 1px dashed #f0ebe2;
-            white-space: nowrap;
-            border-radius: 6px;
-            counter-increment: qnum;
-            position: relative;
-            padding-left: 36px;
+            display: flex; align-items: center; gap: 2px; font-size: 1.25rem; font-weight: 600; letter-spacing: 0.6px;
+            padding: 8px 6px; border-bottom: 1px dashed #f0ebe2; white-space: nowrap; border-radius: 6px;
+            counter-increment: qnum; position: relative; padding-left: 36px;
         }
-        .question-item::before {
-            content: counter(qnum) ".";
-            position: absolute;
-            left: 6px;
-            font-size: 0.8rem;
-            color: #c5bfb6;
-            font-weight: 500;
-            min-width: 22px;
-            text-align: right;
-        }
-        .question-item .blank {
-            display: inline-block;
-            min-width: 40px;
-            border-bottom: 2.5px solid #555;
-            margin: 0 4px;
-            text-align: center;
-            color: transparent;
-            font-weight: 700;
-        }
-        .question-item .blank.revealed {
-            color: #e8784a;
-            border-bottom-color: #e8784a;
-            min-width: auto;
-            padding: 0 2px;
-        }
+        .question-item::before { content: counter(qnum) "."; position: absolute; left: 6px; font-size: 0.8rem; color: #c5bfb6; font-weight: 500; min-width: 22px; text-align: right; }
+        .question-item .blank { display: inline-block; min-width: 40px; border-bottom: 2.5px solid #555; margin: 0 4px; text-align: center; color: transparent; font-weight: 700; }
+        .question-item .blank.revealed { color: #e8784a; border-bottom-color: #e8784a; min-width: auto; padding: 0 2px; }
         .question-item .operator { margin: 0 2px; color: #555; }
         .question-item .equals { margin: 0 3px; color: #888; font-weight: 500; }
         .question-item .number { color: #3e3e3e; }
 
-        .answers-section {
-            margin-top: 28px;
-            padding-top: 20px;
-            border-top: 2px dashed #e8e0d8;
-            display: none;
-        }
+        .answers-section { margin-top: 28px; padding-top: 20px; border-top: 2px dashed #e8e0d8; display: none; }
         .answers-section.visible { display: block; }
-        .answers-section h3 {
-            text-align: center;
-            font-size: 1.1rem;
-            color: #888;
-            margin-bottom: 14px;
-        }
-        .answers-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px 10px;
-            font-size: 0.9rem;
-        }
-        @media (min-width: 900px) {
-            .answers-grid { grid-template-columns: repeat(10, 1fr); }
-        }
-        .answer-item {
-            text-align: center;
-            padding: 5px 4px;
-            background: #fdfaf5;
-            border-radius: 6px;
-            font-weight: 600;
-            color: #e8784a;
-            font-size: 0.85rem;
-        }
+        .answers-section h3 { text-align: center; font-size: 1.1rem; color: #888; margin-bottom: 14px; }
+        .answers-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px 10px; font-size: 0.9rem; }
+        @media (min-width: 900px) { .answers-grid { grid-template-columns: repeat(10, 1fr); } }
+        .answer-item { text-align: center; padding: 5px 4px; background: #fdfaf5; border-radius: 6px; font-weight: 600; color: #e8784a; font-size: 0.85rem; }
 
-        /* 打印容器 */
         #printContainer { display: none; }
 
         @media print {
-            body {
-                background: #fff !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
+            body { background: #fff !important; padding: 0 !important; margin: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .toolbar, .main-card { display: none !important; }
             #printContainer { display: block !important; }
-            @page {
-                size: A4;
-                /* 左右边距保持16mm，防止裁切 */
-                margin: 8mm 16mm 8mm 16mm;
-            }
+            @page { size: A4; margin: 8mm 16mm 8mm 16mm; }
         }
 
-        /* 打印页样式 */
         .print-page {
             page-break-after: always;
             font-family: 'KaiTi', 'STKaiti', '楷体', 'Noto Sans SC', sans-serif;
@@ -298,34 +137,22 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            padding: 0;
         }
         .print-page:last-child { page-break-after: auto; }
 
-        .page-header {
-            text-align: center;
-            margin-bottom: 3mm;
-        }
-        .page-header h2 {
-            font-size: 16pt;
-            margin: 0 0 2mm;
-            letter-spacing: 2px;
-        }
-        .info-line {
-            font-size: 9pt;
-            color: #222;
-            display: flex;
-            justify-content: center;
-            gap: 10mm;
-            margin-bottom: 2mm;
-        }
+        .page-header { text-align: center; margin-bottom: 3mm; }
+        .page-header h2 { font-size: 16pt; margin: 0 0 2mm; letter-spacing: 2px; }
+        .info-line { font-size: 9pt; color: #222; display: flex; justify-content: center; gap: 10mm; margin-bottom: 2mm; }
 
         .day-block {
             flex: 1;
             display: flex;
             flex-direction: column;
-            margin-bottom: 0;
             overflow: hidden;
+        }
+        /* 两个天块之间的间隔 */
+        .day-block + .day-block {
+            margin-top: 4mm;
         }
         .day-title {
             font-size: 10pt;
@@ -336,303 +163,303 @@
             text-align: left;
         }
 
-        /* 4列网格：垂直间距微调至3mm，行高1.8，刚好容纳100题 */
         .questions-grid-print {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 3mm 6mm;        /* 行距由4mm缩小到3mm */
+            gap: 3mm 6mm;
             flex: 1;
         }
         .q-item {
             font-size: 10pt;
             white-space: nowrap;
-            line-height: 1.8;    /* 行高由1.9缩小到1.8 */
+            line-height: 1.8;
             letter-spacing: 0.5px;
         }
     </style>
 </head>
 <body>
-
-    <div class="toolbar" id="toolbar">
-        <button class="btn-generate" onclick="generateQuestions()">🔄 重新生成</button>
-        <span class="separator"></span>
-        <button class="btn-answer" id="btnAnswer" onclick="toggleAnswers()">👁️ 显示答案</button>
-        <span class="separator"></span>
-        <div class="print-group">
-            <label for="pageCountInput">📄 打印页数：</label>
-            <input type="number" id="pageCountInput" value="1" min="1" max="10" step="1">
-            <span class="page-desc">（每页100题 / 2天量）</span>
-            <button class="btn-print" onclick="printMultiplePages()">🖨️ 打印</button>
-        </div>
-        <span class="info-badge" id="infoBadge">屏幕：共50道题</span>
+<div class="toolbar" id="toolbar">
+    <button class="btn-generate" onclick="generateQuestions()">🔄 重新生成</button>
+    <span class="separator"></span>
+    <button class="btn-answer" id="btnAnswer" onclick="toggleAnswers()">👁️ 显示答案</button>
+    <span class="separator"></span>
+    <div class="print-group">
+        <label for="pageCountInput">📄 打印页数：</label>
+        <input type="number" id="pageCountInput" value="1" min="1" max="10" step="1">
+        <span class="page-desc">（每页100题 / 2天量）</span>
+        <button class="btn-print" onclick="printMultiplePages()">🖨️ 打印</button>
     </div>
+    <span class="info-badge" id="infoBadge">屏幕：共50道题</span>
+</div>
 
-    <div class="main-card" id="mainCard">
-        <div class="title-area">
-            <span class="decor">🌟</span>
-            <h1>口 算 练 习</h1>
-            <span class="decor">✏️</span>
-            <p class="subtitle">100以内 · 不进位不退位 · 加减法</p>
-            <p class="subtitle" style="font-size:0.75rem;color:#bbb;">姓名：__________ 日期：__________ 用时：__________</p>
-        </div>
-        <div class="questions-grid" id="questionsGrid"></div>
-        <div class="answers-section" id="answersSection">
-            <h3>📋 答 案 参 考</h3>
-            <div class="answers-grid" id="answersGrid"></div>
-        </div>
+<div class="main-card" id="mainCard">
+    <div class="title-area">
+        <span class="decor">🌟</span>
+        <h1>口 算 练 习</h1>
+        <span class="decor">✏️</span>
+        <p class="subtitle">100以内 · 不进位不退位 · 加减法</p>
+        <p class="subtitle" style="font-size:0.75rem;color:#bbb;">姓名：__________ 日期：__________ 用时：__________</p>
     </div>
+    <div class="questions-grid" id="questionsGrid"></div>
+    <div class="answers-section" id="answersSection">
+        <h3>📋 答 案 参 考</h3>
+        <div class="answers-grid" id="answersGrid"></div>
+    </div>
+</div>
 
-    <div id="printContainer"></div>
+<div id="printContainer"></div>
 
-    <script>
-        (function() {
-            function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-            function getDigits(n) { return { tens: Math.floor(n / 10), ones: n % 10 }; }
+<script>
+    (function() {
+        function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function getDigits(n) { return { tens: Math.floor(n / 10), ones: n % 10 }; }
 
-            function generateNoCarryAddition() {
-                for (let i = 0; i < 200; i++) {
-                    const a = randInt(3, 85);
-                    const da = getDigits(a);
-                    const maxBTens = Math.min(9, 9 - da.tens);
-                    if (maxBTens < 0) continue;
-                    const bTens = randInt(0, maxBTens);
-                    const maxBOnes = Math.min(9, 9 - da.ones);
-                    if (maxBOnes < 0) continue;
-                    const bOnes = randInt(0, maxBOnes);
-                    const b = bTens * 10 + bOnes;
-                    if (b <= 0) continue;
-                    const result = a + b;
-                    if (result >= 100 || result <= 0) continue;
-                    if (a < 10 && b < 10 && Math.random() > 0.35) continue;
-                    return { operands: [a, b], operators: ['+'], result };
-                }
-                const a = randInt(10, 50), b = randInt(1, 30);
-                return { operands: [a, b], operators: ['+'], result: a + b };
+        function generateNoCarryAddition() {
+            for (let i = 0; i < 200; i++) {
+                const a = randInt(3, 85);
+                const da = getDigits(a);
+                const maxBTens = Math.min(9, 9 - da.tens);
+                if (maxBTens < 0) continue;
+                const bTens = randInt(0, maxBTens);
+                const maxBOnes = Math.min(9, 9 - da.ones);
+                if (maxBOnes < 0) continue;
+                const bOnes = randInt(0, maxBOnes);
+                const b = bTens * 10 + bOnes;
+                if (b <= 0) continue;
+                const result = a + b;
+                if (result >= 100 || result <= 0) continue;
+                if (a < 10 && b < 10 && Math.random() > 0.35) continue;
+                return { operands: [a, b], operators: ['+'], result };
             }
+            const a = randInt(10, 50), b = randInt(1, 30);
+            return { operands: [a, b], operators: ['+'], result: a + b };
+        }
 
-            function generateNoBorrowSubtraction() {
-                for (let i = 0; i < 200; i++) {
-                    const a = randInt(10, 95);
-                    const da = getDigits(a);
-                    const maxBTens = da.tens;
-                    const maxBOnes = da.ones;
-                    if (maxBTens < 0 || maxBOnes < 0) continue;
-                    const bTens = randInt(0, maxBTens);
-                    const bOnes = randInt(0, maxBOnes);
-                    const b = bTens * 10 + bOnes;
-                    if (b <= 0) continue;
-                    const result = a - b;
-                    if (result < 0 || a === b) continue;
-                    if (a < 10 && b < 10 && Math.random() > 0.35) continue;
-                    return { operands: [a, b], operators: ['-'], result };
-                }
-                const a = randInt(25, 90), b = randInt(1, 20);
-                return { operands: [a, b], operators: ['-'], result: a - b };
+        function generateNoBorrowSubtraction() {
+            for (let i = 0; i < 200; i++) {
+                const a = randInt(10, 95);
+                const da = getDigits(a);
+                const maxBTens = da.tens;
+                const maxBOnes = da.ones;
+                if (maxBTens < 0 || maxBOnes < 0) continue;
+                const bTens = randInt(0, maxBTens);
+                const bOnes = randInt(0, maxBOnes);
+                const b = bTens * 10 + bOnes;
+                if (b <= 0) continue;
+                const result = a - b;
+                if (result < 0 || a === b) continue;
+                if (a < 10 && b < 10 && Math.random() > 0.35) continue;
+                return { operands: [a, b], operators: ['-'], result };
             }
+            const a = randInt(25, 90), b = randInt(1, 20);
+            return { operands: [a, b], operators: ['-'], result: a - b };
+        }
 
-            function generateThreeNumOp() {
-                const type = randInt(0, 2);
-                if (type === 0) {
-                    const a = randInt(3, 50), b = randInt(1, 30), c = randInt(1, 20);
-                    if (a + b + c >= 100) return generateNoCarryAddition();
-                    return { operands: [a, b, c], operators: ['+', '+'], result: a + b + c };
-                } else if (type === 1) {
-                    const a = randInt(10, 70), b = randInt(1, 20);
-                    const sum = a + b;
-                    const c = randInt(1, Math.min(sum, 40));
-                    if (sum - c < 0 || sum >= 100) return generateNoCarryAddition();
-                    return { operands: [a, b, c], operators: ['+', '-'], result: sum - c };
-                } else {
-                    const a = randInt(15, 80), b = randInt(1, Math.min(a, 30));
-                    const diff = a - b;
-                    const c = randInt(1, 30);
-                    if (diff + c >= 100) return generateNoBorrowSubtraction();
-                    return { operands: [a, b, c], operators: ['-', '+'], result: diff + c };
-                }
+        function generateThreeNumOp() {
+            const type = randInt(0, 2);
+            if (type === 0) {
+                const a = randInt(3, 50), b = randInt(1, 30), c = randInt(1, 20);
+                if (a + b + c >= 100) return generateNoCarryAddition();
+                return { operands: [a, b, c], operators: ['+', '+'], result: a + b + c };
+            } else if (type === 1) {
+                const a = randInt(10, 70), b = randInt(1, 20);
+                const sum = a + b;
+                const c = randInt(1, Math.min(sum, 40));
+                if (sum - c < 0 || sum >= 100) return generateNoCarryAddition();
+                return { operands: [a, b, c], operators: ['+', '-'], result: sum - c };
+            } else {
+                const a = randInt(15, 80), b = randInt(1, Math.min(a, 30));
+                const diff = a - b;
+                const c = randInt(1, 30);
+                if (diff + c >= 100) return generateNoBorrowSubtraction();
+                return { operands: [a, b, c], operators: ['-', '+'], result: diff + c };
             }
+        }
 
-            function generateSingleQuestion() {
-                const useThree = Math.random() < 0.35;
-                let qData = useThree ? generateThreeNumOp() :
-                    (Math.random() < 0.5 ? generateNoCarryAddition() : generateNoBorrowSubtraction());
-                const { operands, operators, result } = qData;
-                const totalOps = operands.length;
-                let blankPos;
-                const r = Math.random();
-                if (r < 0.45) blankPos = 0;
-                else if (r < 0.75) blankPos = 1;
-                else if (r < 0.95 && totalOps >= 2) blankPos = 2;
-                else if (totalOps >= 3) blankPos = 3;
-                else blankPos = 0;
-                const blankAnswer = (blankPos === 0) ? result : operands[blankPos - 1];
-                return { operands, operators, result, blankPosition: blankPos, blankAnswer, totalOps };
+        function generateSingleQuestion() {
+            const useThree = Math.random() < 0.35;
+            let qData = useThree ? generateThreeNumOp() :
+                (Math.random() < 0.5 ? generateNoCarryAddition() : generateNoBorrowSubtraction());
+            const { operands, operators, result } = qData;
+            const totalOps = operands.length;
+            let blankPos;
+            const r = Math.random();
+            if (r < 0.45) blankPos = 0;
+            else if (r < 0.75) blankPos = 1;
+            else if (r < 0.95 && totalOps >= 2) blankPos = 2;
+            else if (totalOps >= 3) blankPos = 3;
+            else blankPos = 0;
+            const blankAnswer = (blankPos === 0) ? result : operands[blankPos - 1];
+            return { operands, operators, result, blankPosition: blankPos, blankAnswer, totalOps };
+        }
+
+        function getQuestionString(q) {
+            const { operands, operators, blankPosition, result } = q;
+            const parts = [];
+            for (let i = 0; i < operands.length; i++) {
+                if (i > 0) parts.push(` ${operators[i - 1]} `);
+                parts.push(blankPosition === i + 1 ? '______' : operands[i]);
             }
+            parts.push(' = ');
+            parts.push(blankPosition === 0 ? '______' : result);
+            return parts.join('');
+        }
 
-            function getQuestionString(q) {
-                const { operands, operators, blankPosition, result } = q;
-                const parts = [];
-                for (let i = 0; i < operands.length; i++) {
-                    if (i > 0) parts.push(` ${operators[i - 1]} `);
-                    parts.push(blankPosition === i + 1 ? '______' : operands[i]);
-                }
-                parts.push(' = ');
-                parts.push(blankPosition === 0 ? '______' : result);
-                return parts.join('');
+        function generateQuestionSet(count) {
+            const questions = [];
+            const seen = new Set();
+            let attempts = 0;
+            while (questions.length < count && attempts < count * 30) {
+                attempts++;
+                const q = generateSingleQuestion();
+                const key = `${q.operands.join(',')}|${q.operators.join(',')}|${q.blankPosition}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                questions.push(q);
             }
-
-            function generateQuestionSet(count) {
-                const questions = [];
-                const seen = new Set();
-                let attempts = 0;
-                while (questions.length < count && attempts < count * 30) {
-                    attempts++;
-                    const q = generateSingleQuestion();
-                    const key = `${q.operands.join(',')}|${q.operators.join(',')}|${q.blankPosition}`;
-                    if (seen.has(key)) continue;
-                    seen.add(key);
-                    questions.push(q);
-                }
-                while (questions.length < count) {
-                    questions.push(generateSingleQuestion());
-                }
-                return questions;
+            while (questions.length < count) {
+                questions.push(generateSingleQuestion());
             }
+            return questions;
+        }
 
-            function renderScreenQuestions(questions) {
-                const grid = document.getElementById('questionsGrid');
-                grid.innerHTML = '';
-                questions.forEach((q, idx) => {
-                    const item = document.createElement('div');
-                    item.className = 'question-item';
-                    let html = '';
-                    for (let i = 0; i < q.totalOps; i++) {
-                        if (i > 0) html += `<span class="operator"> ${q.operators[i - 1]} </span>`;
-                        if (q.blankPosition === i + 1) {
-                            html += `<span class="blank" data-index="${idx}">___</span>`;
-                        } else {
-                            html += `<span class="number">${q.operands[i]}</span>`;
-                        }
+        function renderScreenQuestions(questions) {
+            const grid = document.getElementById('questionsGrid');
+            grid.innerHTML = '';
+            questions.forEach((q, idx) => {
+                const item = document.createElement('div');
+                item.className = 'question-item';
+                let html = '';
+                for (let i = 0; i < q.totalOps; i++) {
+                    if (i > 0) html += `<span class="operator"> ${q.operators[i - 1]} </span>`;
+                    if (q.blankPosition === i + 1) {
+                        html += `<span class="blank" data-index="${idx}">___</span>`;
+                    } else {
+                        html += `<span class="number">${q.operands[i]}</span>`;
                     }
-                    html += `<span class="equals"> = </span>`;
-                    html += q.blankPosition === 0
-                        ? `<span class="blank" data-index="${idx}">___</span>`
-                        : `<span class="number">${q.result}</span>`;
-                    item.innerHTML = html;
-                    grid.appendChild(item);
+                }
+                html += `<span class="equals"> = </span>`;
+                html += q.blankPosition === 0
+                    ? `<span class="blank" data-index="${idx}">___</span>`
+                    : `<span class="number">${q.result}</span>`;
+                item.innerHTML = html;
+                grid.appendChild(item);
+            });
+            window._currentQuestions = questions;
+        }
+
+        function renderScreenAnswers(questions) {
+            const grid = document.getElementById('answersGrid');
+            grid.innerHTML = '';
+            questions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'answer-item';
+                div.textContent = `${i + 1}. ${q.blankAnswer}`;
+                grid.appendChild(div);
+            });
+        }
+
+        function toggleAnswers() {
+            const section = document.getElementById('answersSection');
+            const btn = document.getElementById('btnAnswer');
+            const visible = section.classList.contains('visible');
+            if (visible) {
+                section.classList.remove('visible');
+                btn.classList.remove('showing');
+                btn.innerHTML = '👁️ 显示答案';
+                document.querySelectorAll('.blank.revealed').forEach(b => b.classList.remove('revealed'));
+                document.querySelectorAll('.blank').forEach(b => b.textContent = '___');
+            } else {
+                section.classList.add('visible');
+                btn.classList.add('showing');
+                btn.innerHTML = '🙈 隐藏答案';
+                const qs = window._currentQuestions || [];
+                document.querySelectorAll('.blank').forEach((b, i) => {
+                    if (i < qs.length) {
+                        b.textContent = qs[i].blankAnswer;
+                        b.classList.add('revealed');
+                    }
                 });
-                window._currentQuestions = questions;
+            }
+        }
+
+        function printMultiplePages() {
+            const input = document.getElementById('pageCountInput');
+            let pages = parseInt(input.value, 10);
+            if (isNaN(pages) || pages < 1) pages = 1;
+            if (pages > 10) pages = 10;
+            input.value = pages;
+
+            const totalQuestions = pages * 100;
+            const allQuestions = generateQuestionSet(totalQuestions);
+            let printHTML = '';
+
+            for (let p = 0; p < pages; p++) {
+                const start = p * 100;
+                const pageQuestions = allQuestions.slice(start, start + 100);
+                const day1 = pageQuestions.slice(0, 50);
+                const day2 = pageQuestions.slice(50, 100);
+                const dayNum1 = p * 2 + 1;
+                const dayNum2 = p * 2 + 2;
+
+                printHTML += `<div class="print-page">`;
+                printHTML += `<div class="page-header">`;
+                printHTML += `<h2>口 算 练 习</h2>`;
+                printHTML += `<div class="info-line">`;
+                printHTML += `<span>姓名：__________</span>`;
+                printHTML += `<span>日期：__________</span>`;
+                printHTML += `<span>用时：__________</span>`;
+                printHTML += `</div></div>`;
+
+                printHTML += `<div class="day-block">`;
+                printHTML += `<div class="day-title">第 ${dayNum1} 天 （共50题）</div>`;
+                printHTML += `<div class="questions-grid-print">`;
+                day1.forEach((q) => {
+                    printHTML += `<div class="q-item">${getQuestionString(q)}</div>`;
+                });
+                printHTML += `</div></div>`;
+
+                printHTML += `<div class="day-block">`;
+                printHTML += `<div class="day-title">第 ${dayNum2} 天 （共50题）</div>`;
+                printHTML += `<div class="questions-grid-print">`;
+                day2.forEach((q) => {
+                    printHTML += `<div class="q-item">${getQuestionString(q)}</div>`;
+                });
+                printHTML += `</div></div>`;
+
+                printHTML += `</div>`;
             }
 
-            function renderScreenAnswers(questions) {
-                const grid = document.getElementById('answersGrid');
-                grid.innerHTML = '';
-                questions.forEach((q, i) => {
-                    const div = document.createElement('div');
-                    div.className = 'answer-item';
-                    div.textContent = `${i + 1}. ${q.blankAnswer}`;
-                    grid.appendChild(div);
+            document.getElementById('printContainer').innerHTML = printHTML;
+
+            if (document.getElementById('answersSection').classList.contains('visible')) {
+                toggleAnswers();
+            }
+
+            setTimeout(() => window.print(), 150);
+        }
+
+        function generateQuestions() {
+            const qs = generateQuestionSet(50);
+            renderScreenQuestions(qs);
+            renderScreenAnswers(qs);
+            const visible = document.getElementById('answersSection').classList.contains('visible');
+            if (visible) {
+                document.querySelectorAll('.blank').forEach((b, i) => {
+                    if (i < qs.length) {
+                        b.textContent = qs[i].blankAnswer;
+                        b.classList.add('revealed');
+                    }
                 });
             }
+        }
 
-            function toggleAnswers() {
-                const section = document.getElementById('answersSection');
-                const btn = document.getElementById('btnAnswer');
-                const visible = section.classList.contains('visible');
-                if (visible) {
-                    section.classList.remove('visible');
-                    btn.classList.remove('showing');
-                    btn.innerHTML = '👁️ 显示答案';
-                    document.querySelectorAll('.blank.revealed').forEach(b => b.classList.remove('revealed'));
-                    document.querySelectorAll('.blank').forEach(b => b.textContent = '___');
-                } else {
-                    section.classList.add('visible');
-                    btn.classList.add('showing');
-                    btn.innerHTML = '🙈 隐藏答案';
-                    const qs = window._currentQuestions || [];
-                    document.querySelectorAll('.blank').forEach((b, i) => {
-                        if (i < qs.length) {
-                            b.textContent = qs[i].blankAnswer;
-                            b.classList.add('revealed');
-                        }
-                    });
-                }
-            }
+        window.generateQuestions = generateQuestions;
+        window.toggleAnswers = toggleAnswers;
+        window.printMultiplePages = printMultiplePages;
 
-            function printMultiplePages() {
-                const input = document.getElementById('pageCountInput');
-                let pages = parseInt(input.value, 10);
-                if (isNaN(pages) || pages < 1) pages = 1;
-                if (pages > 10) pages = 10;
-                input.value = pages;
-
-                const totalQuestions = pages * 100;
-                const allQuestions = generateQuestionSet(totalQuestions);
-                let printHTML = '';
-
-                for (let p = 0; p < pages; p++) {
-                    const start = p * 100;
-                    const pageQuestions = allQuestions.slice(start, start + 100);
-                    const day1 = pageQuestions.slice(0, 50);
-                    const day2 = pageQuestions.slice(50, 100);
-
-                    printHTML += `<div class="print-page">`;
-                    printHTML += `<div class="page-header">`;
-                    printHTML += `<h2>口 算 练 习</h2>`;
-                    printHTML += `<div class="info-line">`;
-                    printHTML += `<span>姓名：__________</span>`;
-                    printHTML += `<span>日期：__________</span>`;
-                    printHTML += `<span>用时：__________</span>`;
-                    printHTML += `</div></div>`;
-
-                    printHTML += `<div class="day-block">`;
-                    printHTML += `<div class="day-title">第 1 天 （共50题）</div>`;
-                    printHTML += `<div class="questions-grid-print">`;
-                    day1.forEach((q) => {
-                        printHTML += `<div class="q-item">${getQuestionString(q)}</div>`;
-                    });
-                    printHTML += `</div></div>`;
-
-                    printHTML += `<div class="day-block">`;
-                    printHTML += `<div class="day-title">第 2 天 （共50题）</div>`;
-                    printHTML += `<div class="questions-grid-print">`;
-                    day2.forEach((q) => {
-                        printHTML += `<div class="q-item">${getQuestionString(q)}</div>`;
-                    });
-                    printHTML += `</div></div>`;
-
-                    printHTML += `</div>`;
-                }
-
-                document.getElementById('printContainer').innerHTML = printHTML;
-
-                if (document.getElementById('answersSection').classList.contains('visible')) {
-                    toggleAnswers();
-                }
-
-                setTimeout(() => window.print(), 150);
-            }
-
-            function generateQuestions() {
-                const qs = generateQuestionSet(50);
-                renderScreenQuestions(qs);
-                renderScreenAnswers(qs);
-                const visible = document.getElementById('answersSection').classList.contains('visible');
-                if (visible) {
-                    document.querySelectorAll('.blank').forEach((b, i) => {
-                        if (i < qs.length) {
-                            b.textContent = qs[i].blankAnswer;
-                            b.classList.add('revealed');
-                        }
-                    });
-                }
-            }
-
-            window.generateQuestions = generateQuestions;
-            window.toggleAnswers = toggleAnswers;
-            window.printMultiplePages = printMultiplePages;
-
-            document.addEventListener('DOMContentLoaded', generateQuestions);
-        })();
-    </script>
+        document.addEventListener('DOMContentLoaded', generateQuestions);
+    })();
+</script>
 </body>
 </html>
