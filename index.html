@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（舒适满版打印）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（完美满版）</title>
     <style>
         :root {
             --bg: #fdf8f3;
@@ -145,7 +145,7 @@
         .print-group input:focus { border-color: var(--primary); }
         .page-desc { font-size: 0.8rem; color: #999; }
 
-        /* 主卡片（屏幕练习） */
+        /* 主卡片（屏幕） */
         .main-card {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -285,12 +285,12 @@
             #printContainer { display: block !important; }
             @page {
                 size: A4;
-                /* 充足的左右边距，确保左侧算式完整显示 */
+                /* 左右边距保持16mm，防止裁切 */
                 margin: 8mm 16mm 8mm 16mm;
             }
         }
 
-        /* 打印页样式（4列，无序号，满版） */
+        /* 打印页样式 */
         .print-page {
             page-break-after: always;
             font-family: 'KaiTi', 'STKaiti', '楷体', 'Noto Sans SC', sans-serif;
@@ -320,7 +320,6 @@
             margin-bottom: 2mm;
         }
 
-        /* 两个天块平分高度 */
         .day-block {
             flex: 1;
             display: flex;
@@ -337,17 +336,17 @@
             text-align: left;
         }
 
-        /* 4列网格，间距更舒适 */
+        /* 4列网格：垂直间距微调至3mm，行高1.8，刚好容纳100题 */
         .questions-grid-print {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 4mm 6mm;        /* 行距4mm，列距6mm，宽松不拥挤 */
+            gap: 3mm 6mm;        /* 行距由4mm缩小到3mm */
             flex: 1;
         }
         .q-item {
             font-size: 10pt;
             white-space: nowrap;
-            line-height: 1.9;    /* 配合gap，使垂直分布均匀 */
+            line-height: 1.8;    /* 行高由1.9缩小到1.8 */
             letter-spacing: 0.5px;
         }
     </style>
