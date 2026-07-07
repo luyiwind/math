@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（打印完美满版）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（完美满版打印）</title>
     <style>
         :root {
             --bg: #fdf8f3;
@@ -288,7 +288,7 @@
             font-size: 0.85rem;
         }
 
-        /* ========== 打印容器（屏幕隐藏） ========== */
+        /* ========== 打印容器 ========== */
         #printContainer { display: none; }
 
         @media print {
@@ -303,30 +303,28 @@
             #printContainer { display: block !important; }
             @page {
                 size: A4;
-                /* 关键：左侧增加边距，防止序号被裁切 */
-                margin: 8mm 8mm 8mm 14mm;
+                margin: 8mm; /* 四周均匀边距，不再需要超大左边距 */
             }
         }
 
-        /* ========== 打印页样式（满版、序号可见） ========== */
+        /* ========== 打印页样式（无序号，满版） ========== */
         .print-page {
             page-break-after: always;
             font-family: 'KaiTi', 'STKaiti', '楷体', 'Noto Sans SC', sans-serif;
             color: #000;
-            padding: 0 2mm 0 4mm;   /* 增加左内边距辅助显示序号 */
             display: flex;
             flex-direction: column;
-            height: 100%;            /* 尽可能撑满打印区域 */
+            height: 100%; 
         }
         .print-page:last-child { page-break-after: auto; }
 
         .page-header {
             text-align: center;
-            margin-bottom: 4mm;
+            margin-bottom: 3mm;
         }
         .page-header h2 {
             font-size: 16pt;
-            margin: 0 0 3mm;
+            margin: 0 0 2mm;
             letter-spacing: 2px;
         }
         .info-line {
@@ -335,50 +333,38 @@
             display: flex;
             justify-content: center;
             gap: 12mm;
-            margin-bottom: 3mm;
-            font-weight: 500;
+            margin-bottom: 2mm;
         }
 
-        /* 两个天块平分剩余高度，填满整页 */
+        /* 两个天块均分剩余高度，填满整个页面 */
         .day-block {
             flex: 1;
             display: flex;
             flex-direction: column;
-            margin-bottom: 0;       /* 不再有额外下边距 */
+            margin-bottom: 0;
         }
         .day-title {
-            font-size: 10.5pt;
+            font-size: 10pt;
             font-weight: bold;
             border-bottom: 1px dashed #000;
-            padding-bottom: 2mm;
-            margin-bottom: 3mm;
+            padding-bottom: 1.5mm;
+            margin-bottom: 2.5mm;
             text-align: left;
         }
 
-        /* 5列网格，适当加大行距和列距，使内容均匀分布 */
+        /* 5列网格，大幅度增加行距和行高，让内容自然撑满 */
         .questions-grid-print {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 5.5mm 7mm;        /* 行距5.5mm，列距7mm，让行高增加 */
+            gap: 6mm 6mm;          /* 行距6mm，列距6mm */
             flex: 1;
         }
         .q-item {
-            font-size: 10pt;        /* 稍微增大字体，提升可读性 */
+            font-size: 10pt;
             white-space: nowrap;
-            line-height: 2.4;       /* 配合gap，让每行更高，填满垂直空间 */
-            letter-spacing: 0.4px;
-            padding-left: 2mm;      /* 额外的左内边距，确保序号不被遮挡 */
-        }
-
-        /* 针对超窄打印机的小幅调整 */
-        @media print and (max-width: 210mm) {
-            .questions-grid-print {
-                gap: 4.5mm 5mm;
-            }
-            .q-item {
-                font-size: 9.5pt;
-                line-height: 2.2;
-            }
+            line-height: 2.6;      /* 加高行高，配合gap使垂直分布均匀 */
+            letter-spacing: 0.5px;
+            /* 不再显示序号，完全避免裁切问题 */
         }
     </style>
 </head>
@@ -420,7 +406,6 @@
 
     <script>
         (function() {
-            // ========== 工具函数 ==========
             function randInt(min, max) {
                 return Math.floor(Math.random() * (max - min + 1)) + min;
             }
@@ -429,7 +414,6 @@
                 return { tens: Math.floor(n / 10), ones: n % 10 };
             }
 
-            // ========== 生成规则（不变） ==========
             function generateNoCarryAddition() {
                 for (let i = 0; i < 200; i++) {
                     const a = randInt(3, 85);
@@ -545,7 +529,6 @@
                 return questions;
             }
 
-            // ========== 屏幕显示 ==========
             function renderScreenQuestions(questions) {
                 const grid = document.getElementById('questionsGrid');
                 grid.innerHTML = '';
@@ -606,7 +589,6 @@
                 }
             }
 
-            // ========== 打印多页（每页100题=2天） ==========
             function printMultiplePages() {
                 const input = document.getElementById('pageCountInput');
                 let pages = parseInt(input.value, 10);
@@ -633,21 +615,21 @@
                     printHTML += `<span>用时：__________</span>`;
                     printHTML += `</div></div>`;
 
-                    // 第一天
+                    // 第一天（无序号）
                     printHTML += `<div class="day-block">`;
-                    printHTML += `<div class="day-title">第 1 天 （1 - 50 题）</div>`;
+                    printHTML += `<div class="day-title">第 1 天 （共50题）</div>`;
                     printHTML += `<div class="questions-grid-print">`;
-                    day1.forEach((q, idx) => {
-                        printHTML += `<div class="q-item">${idx + 1}. ${getQuestionString(q)}</div>`;
+                    day1.forEach((q) => {
+                        printHTML += `<div class="q-item">${getQuestionString(q)}</div>`;
                     });
                     printHTML += `</div></div>`;
 
-                    // 第二天
+                    // 第二天（无序号）
                     printHTML += `<div class="day-block">`;
-                    printHTML += `<div class="day-title">第 2 天 （51 - 100 题）</div>`;
+                    printHTML += `<div class="day-title">第 2 天 （共50题）</div>`;
                     printHTML += `<div class="questions-grid-print">`;
-                    day2.forEach((q, idx) => {
-                        printHTML += `<div class="q-item">${idx + 51}. ${getQuestionString(q)}</div>`;
+                    day2.forEach((q) => {
+                        printHTML += `<div class="q-item">${getQuestionString(q)}</div>`;
                     });
                     printHTML += `</div></div>`;
 
@@ -656,7 +638,6 @@
 
                 document.getElementById('printContainer').innerHTML = printHTML;
 
-                // 如果屏幕答案正在显示，先关闭
                 if (document.getElementById('answersSection').classList.contains('visible')) {
                     toggleAnswers();
                 }
