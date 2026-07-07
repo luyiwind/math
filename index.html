@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（宽松打印）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（A4满版）</title>
     <style>
         :root {
             --bg: #fdf8f3;
@@ -154,7 +154,7 @@
             color: #999;
         }
 
-        /* ========== 主内容卡片 ========== */
+        /* ========== 主内容卡片（屏幕练习） ========== */
         .main-card {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -303,65 +303,81 @@
             #printContainer { display: block !important; }
             @page {
                 size: A4;
-                margin: 12mm 10mm 12mm 10mm;
+                margin: 8mm 7mm 8mm 7mm;   /* 适当减小边距，给内容更多空间 */
             }
         }
 
-        /* 打印页样式 - 宽松版 */
+        /* ========== 打印页样式（每页100题，2天量） ========== */
         .print-page {
             page-break-after: always;
             font-family: 'KaiTi', 'STKaiti', '楷体', 'Noto Sans SC', sans-serif;
             color: #000;
-            padding: 0 2mm;
+            padding: 0 1mm;
+            display: flex;
+            flex-direction: column;
+            height: 100%;            /* 尽量撑满打印区域 */
         }
         .print-page:last-child { page-break-after: auto; }
 
         .page-header {
             text-align: center;
-            margin-bottom: 5mm;
+            margin-bottom: 3mm;
         }
         .page-header h2 {
-            font-size: 18pt;
-            margin: 0 0 3mm;
+            font-size: 16pt;
+            margin: 0 0 2mm;
             letter-spacing: 2px;
         }
         .info-line {
-            font-size: 10pt;
+            font-size: 9pt;
             color: #222;
             display: flex;
             justify-content: center;
-            gap: 12mm;
-            margin-bottom: 3mm;
+            gap: 10mm;
+            margin-bottom: 2mm;
             font-weight: 500;
         }
 
+        /* 两个天块之间用稍微明显的分隔 */
         .day-block {
-            margin-bottom: 6mm;
+            margin-bottom: 2.5mm;
             page-break-inside: avoid;
+            flex: 1;                /* 让两个天块均分剩余高度 */
+            display: flex;
+            flex-direction: column;
         }
         .day-title {
-            font-size: 12pt;
+            font-size: 10.5pt;
             font-weight: bold;
-            border-bottom: 1.5px dashed #000;
-            padding-bottom: 2mm;
-            margin-bottom: 4mm;
+            border-bottom: 1px dashed #000;
+            padding-bottom: 1mm;
+            margin-bottom: 2mm;
             text-align: left;
         }
 
-        /* 关键：4列网格，加大行间距和列间距 */
+        /* 核心：5列网格，紧凑但清晰的间距 */
         .questions-grid-print {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5mm 8mm;   /* 行间距5mm, 列间距8mm */
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2.5mm 5mm;        /* 行距2.5mm，列距5mm */
+            flex: 1;
         }
         .q-item {
-            font-size: 11pt;          /* 适当增大字体 */
+            font-size: 9.5pt;       /* 适中字号，保证可读 */
             white-space: nowrap;
-            line-height: 2.2;         /* 行高加大，让垂直方向更透气 */
-            letter-spacing: 0.4px;
+            line-height: 1.9;       /* 行高紧凑但不拥挤 */
+            letter-spacing: 0.3px;
         }
 
-        /* 响应式处理（打印时不需要，但保留以防万一） */
+        /* 针对小算式可能换行的情况，允许缩小间距 */
+        @media print and (max-width: 210mm) {
+            .questions-grid-print {
+                gap: 2mm 4mm;
+            }
+            .q-item {
+                font-size: 9pt;
+            }
+        }
     </style>
 </head>
 <body>
@@ -375,7 +391,7 @@
         <div class="print-group">
             <label for="pageCountInput">📄 打印页数：</label>
             <input type="number" id="pageCountInput" value="1" min="1" max="10" step="1">
-            <span class="page-desc">（每页50题 / 1天量）</span>
+            <span class="page-desc">（每页100题 / 2天量）</span>
             <button class="btn-print" onclick="printMultiplePages()">🖨️ 打印</button>
         </div>
         <span class="info-badge" id="infoBadge">屏幕：共50道题</span>
@@ -411,7 +427,7 @@
                 return { tens: Math.floor(n / 10), ones: n % 10 };
             }
 
-            // ========== 生成规则（同前，略作精简） ==========
+            // ========== 生成规则 ==========
             function generateNoCarryAddition() {
                 for (let i = 0; i < 200; i++) {
                     const a = randInt(3, 85);
@@ -588,7 +604,7 @@
                 }
             }
 
-            // ========== 打印多页（每页50题） ==========
+            // ========== 打印多页（每页100题=2天） ==========
             function printMultiplePages() {
                 const input = document.getElementById('pageCountInput');
                 let pages = parseInt(input.value, 10);
@@ -596,12 +612,16 @@
                 if (pages > 10) pages = 10;
                 input.value = pages;
 
-                const totalQuestions = pages * 50;
+                const totalQuestions = pages * 100;
                 const allQuestions = generateQuestionSet(totalQuestions);
                 let printHTML = '';
 
                 for (let p = 0; p < pages; p++) {
-                    const dayQuestions = allQuestions.slice(p * 50, p * 50 + 50);
+                    const start = p * 100;
+                    const pageQuestions = allQuestions.slice(start, start + 100);
+                    const day1 = pageQuestions.slice(0, 50);
+                    const day2 = pageQuestions.slice(50, 100);
+
                     printHTML += `<div class="print-page">`;
                     printHTML += `<div class="page-header">`;
                     printHTML += `<h2>口 算 练 习</h2>`;
@@ -611,19 +631,30 @@
                     printHTML += `<span>用时：__________</span>`;
                     printHTML += `</div></div>`;
 
+                    // 第一天
                     printHTML += `<div class="day-block">`;
-                    printHTML += `<div class="day-title">第 ${p + 1} 天 （共50题）</div>`;
+                    printHTML += `<div class="day-title">第 1 天 （1 - 50 题）</div>`;
                     printHTML += `<div class="questions-grid-print">`;
-                    dayQuestions.forEach((q, idx) => {
+                    day1.forEach((q, idx) => {
                         printHTML += `<div class="q-item">${idx + 1}. ${getQuestionString(q)}</div>`;
                     });
                     printHTML += `</div></div>`;
+
+                    // 第二天
+                    printHTML += `<div class="day-block">`;
+                    printHTML += `<div class="day-title">第 2 天 （51 - 100 题）</div>`;
+                    printHTML += `<div class="questions-grid-print">`;
+                    day2.forEach((q, idx) => {
+                        printHTML += `<div class="q-item">${idx + 51}. ${getQuestionString(q)}</div>`;
+                    });
+                    printHTML += `</div></div>`;
+
                     printHTML += `</div>`;
                 }
 
                 document.getElementById('printContainer').innerHTML = printHTML;
 
-                // 如果屏幕答案正显示，先关闭
+                // 若屏幕答案显示中，先关闭
                 if (document.getElementById('answersSection').classList.contains('visible')) {
                     toggleAnswers();
                 }
