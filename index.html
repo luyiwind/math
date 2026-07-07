@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（最终修复版）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（移动适配版）</title>
     <style>
         :root {
             --bg: #fdf8f3; --card-bg: #ffffff; --primary: #4a90d9; --accent: #f6a623;
@@ -44,6 +44,7 @@
         .info-inputs input { font-family:inherit; font-size:0.9rem; border:none; border-bottom:1.5px dashed #ccc; outline:none; width:100px; text-align:center; background:transparent; }
         .info-inputs input:focus { border-bottom-color:var(--accent); }
 
+        /* 桌面端题目网格 3列 */
         .questions-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px 14px; counter-reset:qnum; }
         @media (min-width:900px){ .questions-grid { grid-template-columns:repeat(3,1fr); } }
         .question-item {
@@ -102,6 +103,50 @@
         .export-item { font-size: 11pt; line-height: 1.8; white-space: nowrap; }
         .wrong-mark { color: #e74c3c; }
         .correction { color: #e74c3c; margin-left: 4px; }
+        .export-blank { text-decoration: underline; min-width: 30px; display: inline-block; text-align: center; margin: 0 2px; }
+
+        /* 移动端优化 */
+        @media (max-width: 640px) {
+            body { padding: 10px 10px 180px; }
+            .toolbar {
+                padding: 8px 12px; gap: 6px; border-radius: 30px;
+            }
+            .toolbar button {
+                font-size: 0.75rem; padding: 6px 12px;
+            }
+            .btn-timer { min-width: 90px; }
+            .btn-reset { width: 36px; height: 36px; font-size: 1rem; }
+            .timer-display { font-size: 0.9rem; min-width: 45px; }
+            .separator { display: none; }
+            .main-card { padding: 16px 10px 12px; border-radius: 12px; }
+            .title-area h1 { font-size: 1.3rem; }
+            .info-inputs { gap: 10px; font-size: 0.75rem; }
+            .info-inputs input { width: 70px; font-size: 0.8rem; }
+            .questions-grid {
+                grid-template-columns: repeat(2, 1fr); gap: 4px 6px;
+            }
+            .question-item {
+                font-size: 0.78rem; padding: 5px 3px 5px 22px; letter-spacing: 0.2px;
+            }
+            .question-item::before {
+                left: 2px; font-size: 0.65rem; min-width: 16px;
+            }
+            .blank {
+                min-width: 28px; margin: 0 1px; border-bottom-width: 2px;
+            }
+            .blank.active-blank { min-width: 32px; }
+            .keyboard-panel {
+                max-width: 100%; border-radius: 12px 12px 0 0; padding: 8px 10px 12px; gap: 8px;
+            }
+            .key-main button {
+                font-size: 1.1rem; padding: 10px 6px; min-height: 40px; border-radius: 8px;
+            }
+            .key-side { min-width: 55px; }
+            .preview { font-size: 1.1rem; padding: 8px 4px; min-height: 36px; }
+            .btn-done { font-size: 0.85rem; padding: 10px 8px; }
+            .print-group { flex-wrap: wrap; gap: 4px; font-size: 0.75rem; }
+            .print-group input { width: 40px; padding: 4px 6px; font-size: 0.8rem; }
+        }
     </style>
 </head>
 <body>
@@ -164,7 +209,7 @@
     (function() {
         let currentQuestions = [], userAnswers = {}, firstWrongAnswers = {}, errorQuestions = new Set();
         let reviewMode = false, isSubmitted = false, activeIdx = -1, currentInput = '';
-        let isOverwritePending = false; // 覆盖模式标志
+        let isOverwritePending = false;
         let timerSec = 0, timerInterval = null, timerRunning = false;
         const MAX_LEN = 3;
 
@@ -297,7 +342,6 @@
             document.querySelectorAll('.active-blank').forEach(el=>el.classList.remove('active-blank'));
             activeIdx=idx;
             currentInput = userAnswers[idx] || '';
-            // 如果是批改模式且该题是错误题，开启覆盖模式
             isOverwritePending = reviewMode && errorQuestions.has(idx);
             updateBlanks(); updatePreview();
             showKey();
@@ -320,7 +364,6 @@
         }
         function digit(d){
             if(activeIdx<0) return;
-            // 覆盖模式：首次输入清空旧答案
             if(isOverwritePending){
                 currentInput = '';
                 isOverwritePending = false;
@@ -335,7 +378,7 @@
             currentInput = currentInput.slice(0,-1);
             userAnswers[activeIdx] = currentInput;
             if(!currentInput) delete userAnswers[activeIdx];
-            isOverwritePending = false; // 手动修改后取消覆盖模式
+            isOverwritePending = false;
             updateBlanks(); updatePreview(); updateBtn();
         }
         function clearInput(){
@@ -424,6 +467,25 @@
             setTimeout(()=>{ window.print(); document.getElementById('printContainer').style.display='none'; },200);
         }
 
+        function exportQStr(q, val) {
+            let parts = '';
+            for (let i = 0; i < q.len; i++) {
+                if (i > 0) parts += ` ${q.ops[i - 1]} `;
+                if (q.blankPos === i + 1) {
+                    parts += `<span class="export-blank">${val !== undefined && val !== '' ? val : '______'}</span>`;
+                } else {
+                    parts += q.op[i];
+                }
+            }
+            parts += ' = ';
+            if (q.blankPos === 0) {
+                parts += `<span class="export-blank">${val !== undefined && val !== '' ? val : '______'}</span>`;
+            } else {
+                parts += q.res;
+            }
+            return parts;
+        }
+
         function buildExport(){
             let name = document.getElementById('studentName').value || '未填';
             let date = document.getElementById('practiceDate').value || new Date().toISOString().slice(0,10);
@@ -455,7 +517,7 @@
                 } else if (u !== '') {
                     suffix = ' ✓';
                 }
-                let str = qStr(q, displayVal);
+                let str = exportQStr(q, displayVal);
                 html += `<div class="export-item">${i+1}. ${str}${suffix}</div>`;
             });
             html += `</div></div>`;
