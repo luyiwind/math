@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（静默下载版）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（终极版）</title>
     <style>
         :root {
             --bg: #fdf8f3; --card-bg: #ffffff; --primary: #4a90d9; --accent: #f6a623;
@@ -13,6 +13,7 @@
         body {
             font-family: 'KaiTi','STKaiti','楷体',sans-serif; background: var(--bg);
             min-height:100vh; padding:20px 20px 200px; display:flex; flex-direction:column; align-items:center;
+            transition: padding-bottom 0.3s;
         }
         .toolbar {
             position:sticky; top:16px; z-index:100; display:flex; flex-wrap:wrap; gap:10px;
@@ -64,7 +65,7 @@
         .keyboard-panel {
             position:fixed; bottom:0; z-index:200; background:#fff; border-top:2px solid #e8e0d8;
             box-shadow:0 -4px 20px rgba(0,0,0,0.1); padding:10px 16px 16px; transform:translateY(100%);
-            transition:0.35s; display:flex; gap:12px; max-width:600px; left:50%; transform:translateX(-50%) translateY(100%); border-radius:16px 16px 0 0;
+            transition: transform 0.35s, padding-bottom 0.3s; display:flex; gap:12px; max-width:600px; left:50%; transform:translateX(-50%) translateY(100%); border-radius:16px 16px 0 0;
         }
         .keyboard-panel.visible { transform:translateX(-50%) translateY(0); }
         .key-main { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; flex:1; }
@@ -275,9 +276,19 @@
             reviewMode=true;
         }
 
-        function showKey(){ document.getElementById('keyboardPanel').classList.add('visible'); }
+        // 键盘遮挡修复：动态调整body底部内边距
+        function showKey(){
+            const panel = document.getElementById('keyboardPanel');
+            panel.classList.add('visible');
+            // 调整body的padding-bottom，防止遮挡最后一道题
+            const panelHeight = panel.offsetHeight;
+            document.body.style.paddingBottom = `${panelHeight + 20}px`;
+        }
         function hideKey(){
-            document.getElementById('keyboardPanel').classList.remove('visible');
+            const panel = document.getElementById('keyboardPanel');
+            panel.classList.remove('visible');
+            // 恢复body的默认padding
+            document.body.style.paddingBottom = '200px';
             activeIdx=-1; currentInput=''; updateBlanks(); updatePreview();
             document.querySelectorAll('.active').forEach(el=>el.classList.remove('active'));
             document.querySelectorAll('.active-blank').forEach(el=>el.classList.remove('active-blank'));
@@ -295,7 +306,22 @@
             document.querySelectorAll('.active').forEach(el=>el.classList.remove('active'));
             document.querySelectorAll('.active-blank').forEach(el=>el.classList.remove('active-blank'));
             activeIdx=idx; currentInput=userAnswers[idx]||''; updateBlanks(); updatePreview();
-            showKey(); document.querySelector(`.question-item[data-qindex="${idx}"]`)?.scrollIntoView({behavior:'smooth',block:'center'});
+            showKey();
+            // 滚动到当前题目，并留出键盘空间
+            setTimeout(() => {
+                const item = document.querySelector(`.question-item[data-qindex="${idx}"]`);
+                if (item) {
+                    const rect = item.getBoundingClientRect();
+                    const keyboardHeight = document.getElementById('keyboardPanel').offsetHeight;
+                    const windowHeight = window.innerHeight;
+                    if (rect.bottom + keyboardHeight > windowHeight) {
+                        const scrollY = window.scrollY + rect.top - (windowHeight - keyboardHeight - rect.height) / 2;
+                        window.scrollTo({ top: scrollY, behavior: 'smooth' });
+                    } else {
+                        item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }, 100);
             let item=document.querySelector(`.question-item[data-qindex="${idx}"]`);
             if(item){ item.classList.add('active'); item.querySelector('.blank')?.classList.add('active-blank'); }
         }
@@ -383,7 +409,7 @@
             setTimeout(()=>{ window.print(); document.getElementById('printContainer').style.display='none'; },200);
         }
 
-        // 图片导出
+        // 图片导出（修正：第一次错误答案显示在算式中，改正后标注△）
         function buildExport(){
             let name = document.getElementById('studentName').value || '未填';
             let date = document.getElementById('practiceDate').value || new Date().toISOString().slice(0,10);
@@ -408,12 +434,20 @@
                 let correct = q.ans;
                 let isWrong = tempErrors.has(i);
                 let first = tempFirstWrong[i];
-                let hasCorrection = first && !isWrong && u === String(correct);
-                let str = qStr(q, u);
+                let hasCorrection = first && !isWrong && u === String(correct); // 曾经错现已改正
+                let displayVal;
+                if (hasCorrection) {
+                    displayVal = first; // 算式中显示第一次错误的答案
+                } else if (isWrong) {
+                    displayVal = u; // 仍然错误，显示当前错误答案
+                } else {
+                    displayVal = u; // 正确或未填
+                }
+                let str = qStr(q, displayVal);
                 let suffix = '';
-                if(hasCorrection) suffix = ` <span class="wrong-mark">${first}</span><span class="correction">△:${correct}</span>`;
-                else if(isWrong) suffix = ` <span class="wrong-mark">✗ ${u}</span>`;
-                else if(u !== '') suffix = ' ✓';
+                if (hasCorrection) suffix = ` <span class="wrong-mark">✗</span><span class="correction">△:${correct}</span>`;
+                else if (isWrong) suffix = ` <span class="wrong-mark">✗</span>`;
+                else if (u !== '') suffix = ' ✓';
                 html += `<div class="export-item">${i+1}. ${str}${suffix}</div>`;
             });
             html += `</div></div>`;
