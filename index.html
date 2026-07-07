@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（交卷批改版）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（完整版）</title>
     <style>
         :root {
             --bg: #fdf8f3;
@@ -32,15 +32,16 @@
             flex-direction: column;
             align-items: center;
         }
+        /* 工具栏 */
         .toolbar {
             position: sticky; top: 16px; z-index: 100;
-            display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center;
+            display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center;
             background: var(--card-bg); border-radius: 50px; padding: 12px 24px;
             box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 28px;
             backdrop-filter: blur(8px);
         }
         .toolbar button {
-            font-family: inherit; font-size: 0.95rem; font-weight: 600; padding: 10px 20px;
+            font-family: inherit; font-size: 0.9rem; font-weight: 600; padding: 8px 18px;
             border-radius: 50px; border: none; cursor: pointer; transition: 0.25s; letter-spacing: 0.5px;
             white-space: nowrap; display: flex; align-items: center; gap: 6px; user-select: none;
         }
@@ -56,7 +57,8 @@
         .btn-timer.submitted { background: #f0f0f0; border-color: #ccc; color: #999; cursor: not-allowed; }
         @keyframes pulse-border { 0%,100%{ box-shadow: 0 0 0 0 rgba(232,120,74,0.3); } 50%{ box-shadow: 0 0 0 8px rgba(232,120,74,0); } }
         .btn-reset-timer { background: #fff; border: 2px solid #e8e0d8; color: #999; font-size: 1.2rem; width: 42px; height: 42px; border-radius: 50%; padding: 0; justify-content: center; }
-        .btn-reset-timer:hover { background: #f5f5f0; color: #666; border-color: #ccc; }
+        .btn-download-pdf, .btn-download-img { background: #fff; color: #2c3e50; border: 2px solid #2c3e50; }
+        .btn-download-pdf:hover, .btn-download-img:hover { background: #f0f4f8; transform: translateY(-2px); }
         .timer-display { font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: 700; color: #e8784a; min-width: 55px; text-align: center; letter-spacing: 1px; }
         .toolbar .separator { width: 1px; height: 28px; background: var(--border); margin: 0 4px; border-radius: 1px; }
         .toolbar .info-badge { font-size: 0.9rem; color: var(--text-light); background: #f9f6f1; padding: 8px 16px; border-radius: 50px; font-weight: 500; }
@@ -64,13 +66,17 @@
         .print-group input { font-family: inherit; font-size: 0.9rem; width: 55px; padding: 6px 8px; border: 2px solid var(--border); border-radius: 20px; text-align: center; outline: none; }
         .print-group input:focus { border-color: var(--primary); }
         .page-desc { font-size: 0.8rem; color: #999; }
+
+        /* 主卡片 */
         .main-card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 28px 24px 20px; width: 100%; max-width: 1000px; }
         .title-area { text-align: center; margin-bottom: 20px; }
         .title-area h1 { font-size: 1.6rem; font-weight: 700; color: #4a4a4a; letter-spacing: 1px; }
         .subtitle { font-size: 0.85rem; color: #999; margin-top: 2px; }
         .decor { display: inline-block; font-size: 1.3rem; margin: 0 5px; animation: bounce 2s infinite; }
-        .decor:nth-child(1){animation-delay:0s;} .decor:nth-child(2){animation-delay:0.4s;} .decor:nth-child(3){animation-delay:0.8s;}
-        @keyframes bounce { 0%,100%{transform:translateY(0);} 30%{transform:translateY(-8px);} 50%{transform:translateY(0);} 70%{transform:translateY(-4px);} }
+        .info-inputs { display: flex; justify-content: center; gap: 20px; margin-top: 8px; font-size: 0.85rem; color: #666; }
+        .info-inputs input { font-family: inherit; font-size: 0.9rem; border: none; border-bottom: 1.5px dashed #ccc; outline: none; padding: 2px 6px; width: 100px; text-align: center; background: transparent; }
+        .info-inputs input:focus { border-bottom-color: var(--accent); }
+
         .questions-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px 14px; counter-reset: qnum; }
         @media (min-width:900px){ .questions-grid { grid-template-columns: repeat(3,1fr); gap: 8px 18px; } }
         .question-item {
@@ -82,22 +88,16 @@
         .question-item.active { background: #fffdf5; box-shadow: inset 0 0 0 2px var(--accent); border-radius: 8px; }
         .question-item.completed { background: #fafff8; }
         .question-item.error { background: var(--error-bg); }
-        .operator, .equals, .number { color: #555; }
-        .equals { margin: 0 3px; }
         .blank {
             display: inline-block; min-width: 38px; border-bottom: 2.5px solid #555; margin: 0 3px; text-align: center;
             color: #aaa; font-weight: 700; cursor: pointer; transition: all 0.2s; user-select: none; padding: 0 2px; border-radius: 2px;
         }
-        .blank:hover { border-bottom-color: var(--accent); color: #888; background: #fffdf5; }
         .blank.filled { color: #2c6e49; border-bottom-color: #4caf84; }
         .blank.active-blank { border-bottom-color: var(--accent); color: #e8784a; background: #fff8ee; animation: blink-border 0.8s infinite; min-width: 42px; }
         @keyframes blink-border { 0%,100%{ border-bottom-width:3px; } 50%{ border-bottom-width:1.5px; } }
         .answers-section { margin-top: 20px; padding-top: 16px; border-top: 2px dashed #e8e0d8; display: none; }
         .answers-section.visible { display: block; }
-        .answers-section h3 { text-align: center; font-size: 1rem; color: #888; margin-bottom: 10px; }
         .answers-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px 8px; font-size: 0.85rem; }
-        @media (min-width:900px){ .answers-grid { grid-template-columns: repeat(10,1fr); } }
-        .answer-item { text-align: center; padding: 4px 3px; background: #fdfaf5; border-radius: 5px; font-weight: 600; color: #e8784a; font-size: 0.8rem; }
         .keyboard-panel {
             position: fixed; bottom: 0; z-index: 200; background: #fff; border-top: 2px solid #e8e0d8;
             box-shadow: 0 -4px 20px rgba(0,0,0,0.10); padding: 10px 16px 16px; transform: translateY(100%);
@@ -106,38 +106,32 @@
         .keyboard-panel.visible { transform: translateX(-50%) translateY(0); }
         .keyboard-main { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; flex: 1; }
         .keyboard-main button { font-family: inherit; font-size: 1.3rem; font-weight: 700; padding: 12px 8px; border-radius: 12px; border: 2px solid #e8e0d8; background: #fafaf7; cursor: pointer; min-height: 48px; }
-        .keyboard-main button:active { background: #f0ebe2; transform: scale(0.94); }
-        .key-del { color: #c0392b; border-color: #fdd; background: #fff5f5; }
-        .key-clear { color: #888; }
+        .key-del { color: #c0392b; }
         .keyboard-side { display: flex; flex-direction: column; gap: 8px; min-width: 70px; }
-        .preview { font-size: 1.4rem; font-weight: 700; text-align: center; padding: 10px 6px; background: #fffdf5; border: 2px dashed #e0d8c8; border-radius: 12px; color: #e8784a; min-height: 44px; display: flex; align-items: center; justify-content: center; letter-spacing: 2px; }
-        .preview.empty { color: #ccc; font-size: 0.9rem; }
-        .btn-done { font-family: inherit; font-size: 1rem; font-weight: 700; padding: 12px 10px; border-radius: 12px; border: none; cursor: pointer; background: var(--success); color: #fff; box-shadow: 0 3px 12px rgba(76,175,132,0.3); }
-        .btn-done:hover { background: #3d9d6e; transform: translateY(-1px); }
-        #printContainer { display: none; }
-        @media print {
-            body { background: #fff !important; padding: 0 !important; }
-            .toolbar,.main-card,.keyboard-panel { display: none !important; }
-            #printContainer { display: block !important; }
-            @page { size: A4; margin: 8mm 16mm; }
+        .preview { font-size: 1.4rem; font-weight: 700; text-align: center; padding: 10px 6px; background: #fffdf5; border: 2px dashed #e0d8c8; border-radius: 12px; color: #e8784a; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+        .preview.empty { color: #ccc; }
+        .btn-done { font-family: inherit; font-size: 1rem; font-weight: 700; padding: 12px 10px; border-radius: 12px; border: none; cursor: pointer; background: var(--success); color: #fff; }
+        #printContainer, #exportContainer { display: none; }
+
+        @media print { body { background: #fff !important; padding: 0 !important; } .toolbar,.main-card,.keyboard-panel { display: none !important; } }
+        /* 导出样式 */
+        .export-page {
+            width: 210mm; min-height: 297mm; padding: 15mm 15mm; font-family: 'KaiTi','STKaiti','楷体',sans-serif;
+            background: #fff; color: #000; margin: 0 auto;
         }
-        .print-page { page-break-after: always; font-family: 'KaiTi','STKaiti','楷体',sans-serif; display: flex; flex-direction: column; height: 100%; }
-        .print-page:last-child { page-break-after: auto; }
-        .page-header { text-align: center; margin-bottom: 3mm; }
-        .page-header h2 { font-size: 16pt; }
-        .info-line { font-size: 9pt; display: flex; justify-content: center; gap: 10mm; margin-bottom: 2mm; }
-        .day-block { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .day-block+.day-block { margin-top: 4mm; }
-        .day-title { font-size: 10pt; font-weight: bold; border-bottom: 1px dashed #000; padding-bottom: 1.5mm; margin-bottom: 2mm; }
-        .questions-grid-print { display: grid; grid-template-columns: repeat(4,1fr); gap: 3mm 6mm; flex: 1; }
-        .q-item { font-size: 10pt; white-space: nowrap; line-height: 1.8; letter-spacing: 0.5px; }
+        .export-header { text-align: center; margin-bottom: 8mm; }
+        .export-header h2 { font-size: 22pt; margin-bottom: 3mm; }
+        .export-info { font-size: 11pt; display: flex; justify-content: center; gap: 15mm; }
+        .export-list { display: grid; grid-template-columns: repeat(4,1fr); gap: 4mm 8mm; }
+        .export-item { font-size: 11pt; line-height: 1.8; white-space: nowrap; }
+        .export-item .wrong-mark { color: #e74c3c; font-weight: bold; }
+        .export-item .correction { color: #e74c3c; margin-left: 4px; }
+
         @media (max-width:640px){
             .questions-grid { grid-template-columns: repeat(2,1fr); }
-            .toolbar { padding: 8px 10px; gap: 6px; border-radius: 30px; }
-            .toolbar button { font-size: 0.8rem; padding: 7px 12px; }
-            .keyboard-panel { max-width: 100%; border-radius: 12px 12px 0 0; padding: 8px 10px 12px; }
-            .keyboard-main button { font-size: 1.1rem; padding: 10px 6px; min-height: 40px; }
-            body { padding: 10px 10px 180px; }
+            .toolbar { padding: 8px 10px; gap: 6px; }
+            .toolbar button { font-size: 0.8rem; padding: 6px 12px; }
+            .keyboard-panel { max-width: 100%; }
         }
     </style>
 </head>
@@ -148,6 +142,9 @@
     <button class="btn-timer" id="btnTimer" onclick="handleTimerClick()">▶ 开始计时</button>
     <span class="timer-display" id="timerDisplay">00:00</span>
     <button class="btn-reset-timer" onclick="resetTimerOnly()" title="重置计时">↺</button>
+    <span class="separator"></span>
+    <button class="btn-download-pdf" onclick="downloadPDF()">📥 保存PDF</button>
+    <button class="btn-download-img" onclick="downloadImage()">🖼️ 保存图片</button>
     <span class="separator"></span>
     <button class="btn-answer" id="btnAnswer" onclick="toggleAnswers()">👁️ 显示答案</button>
     <span class="separator"></span>
@@ -163,7 +160,11 @@
 <div class="main-card" id="mainCard">
     <div class="title-area">
         <span class="decor">🌟</span><h1>口 算 练 习</h1><span class="decor">✏️</span>
-        <p class="subtitle">100以内 · 不进位不退位 · 加减法 · 点击空格开始</p>
+        <p class="subtitle">100以内 · 不进位不退位 · 加减法</p>
+        <div class="info-inputs">
+            <label>姓名：<input type="text" id="studentName" placeholder="输入姓名" value=""></label>
+            <label>日期：<input type="text" id="practiceDate" placeholder="2026-07-07" value=""></label>
+        </div>
     </div>
     <div class="questions-grid" id="questionsGrid"></div>
     <div class="answers-section" id="answersSection">
@@ -177,29 +178,34 @@
         <button onclick="inputDigit('1')">1</button><button onclick="inputDigit('2')">2</button><button onclick="inputDigit('3')">3</button>
         <button onclick="inputDigit('4')">4</button><button onclick="inputDigit('5')">5</button><button onclick="inputDigit('6')">6</button>
         <button onclick="inputDigit('7')">7</button><button onclick="inputDigit('8')">8</button><button onclick="inputDigit('9')">9</button>
-        <button class="key-del" onclick="inputBackspace()">⌫ 退格</button><button onclick="inputDigit('0')">0</button><button class="key-clear" onclick="inputClear()">✕ 清空</button>
+        <button class="key-del" onclick="inputBackspace()">⌫</button><button onclick="inputDigit('0')">0</button><button class="key-clear" onclick="inputClear()">✕</button>
     </div>
     <div class="keyboard-side">
         <div class="preview empty" id="keyboardPreview">___</div>
         <button class="btn-done" onclick="confirmAndNext()">✓ 好了</button>
     </div>
 </div>
-<div id="printContainer"></div>
 
+<div id="printContainer"></div>
+<div id="exportContainer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
     (function() {
         let currentQuestions = [];
         let userAnswers = {};
+        let firstWrongAnswers = {}; // { index: '第一次错误答案' }
         let errorQuestions = new Set();
-        let reviewMode = false;      // 交卷后为true，修改错题时判断
+        let reviewMode = false;
+        let isSubmitted = false;
         let activeQuestionIndex = -1;
         let currentInput = '';
         let timerSeconds = 0;
         let timerInterval = null;
         let timerRunning = false;
-        let isSubmitted = false;    // 是否已交卷
         const MAX_INPUT_LENGTH = 3;
 
+        // 工具函数
         function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
         function isNoCarryAdd(a,b){
             if(a+b>=100)return false;
@@ -299,71 +305,42 @@
         function updateTimerButtonText(){
             const btn=document.getElementById('btnTimer');
             if(isSubmitted){
-                btn.textContent='✓ 已交卷';
-                btn.classList.add('submitted');
-                btn.classList.remove('running');
-                btn.disabled=true;
+                btn.textContent='✓ 已交卷'; btn.classList.add('submitted'); btn.disabled=true;
             }else if(checkAllFilled()){
-                btn.textContent='📝 交卷';
-                btn.classList.remove('running','submitted');
-                btn.disabled=false;
+                btn.textContent='📝 交卷'; btn.classList.remove('running','submitted'); btn.disabled=false;
             }else{
-                if(timerRunning){
-                    btn.textContent='⏸ 暂停';
-                    btn.classList.add('running');
-                }else{
-                    btn.textContent='▶ 开始计时';
-                    btn.classList.remove('running');
-                }
-                btn.classList.remove('submitted');
-                btn.disabled=false;
+                btn.textContent=timerRunning?'⏸ 暂停':'▶ 开始计时';
+                btn.classList.remove('submitted'); btn.disabled=false;
             }
         }
 
         function startTimerIfNeeded(){
             if(!timerRunning&&!isSubmitted){
-                // 自动开始计时
                 timerInterval=setInterval(()=>{timerSeconds++;updateTimerDisplay();},1000);
-                timerRunning=true;
-                updateTimerButtonText();
+                timerRunning=true; updateTimerButtonText();
             }
         }
 
         function pauseTimer(){
             if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
-            timerRunning=false;
-            updateTimerButtonText();
+            timerRunning=false; updateTimerButtonText();
         }
 
         function handleTimerClick(){
             if(isSubmitted)return;
-            if(checkAllFilled()){
-                // 交卷
-                submitExam();
-            }else{
-                if(timerRunning){
-                    pauseTimer();
-                }else{
-                    timerInterval=setInterval(()=>{timerSeconds++;updateTimerDisplay();},1000);
-                    timerRunning=true;
-                    updateTimerButtonText();
-                }
-            }
+            if(checkAllFilled()){ submitExam(); }
+            else{ timerRunning?pauseTimer():(timerInterval=setInterval(()=>{timerSeconds++;updateTimerDisplay();},1000),timerRunning=true,updateTimerButtonText()); }
         }
 
         function submitExam(){
-            pauseTimer();
-            isSubmitted=true;
-            checkAllAnswers();
-            updateTimerButtonText();
-            hideKeyboard();
+            pauseTimer(); isSubmitted=true; checkAllAnswers(); updateTimerButtonText(); hideKeyboard();
         }
 
         function resetTimerOnly(){
             clearInterval(timerInterval);timerInterval=null;timerRunning=false;
             timerSeconds=0;updateTimerDisplay();
             isSubmitted=false;reviewMode=false;
-            clearErrorMarks();
+            clearErrorMarks(); firstWrongAnswers={};
             updateTimerButtonText();
         }
 
@@ -379,9 +356,9 @@
                 const userVal=userAnswers[idx];
                 if(userVal!==undefined&&userVal!==''){
                     if(parseInt(userVal)!==q.blankAnswer){
+                        if(!firstWrongAnswers.hasOwnProperty(idx)) firstWrongAnswers[idx]=userVal; // 记录第一次错误
                         errorQuestions.add(idx);
-                        const item=document.querySelector(`.question-item[data-qindex="${idx}"]`);
-                        if(item)item.classList.add('error');
+                        document.querySelector(`.question-item[data-qindex="${idx}"]`)?.classList.add('error');
                     }
                 }
             });
@@ -403,7 +380,7 @@
         }
 
         function activateQuestion(index){
-            if(isSubmitted&&!errorQuestions.has(index))return; // 交卷后只能点击错题
+            if(isSubmitted&&!errorQuestions.has(index))return;
             startTimerIfNeeded();
             if(activeQuestionIndex===index){
                 if(userAnswers[index]&&userAnswers[index]!==''){
@@ -413,8 +390,7 @@
                         document.querySelector(`.question-item[data-qindex="${index}"]`)?.classList.remove('error');
                         errorQuestions.delete(index);
                     }
-                    updateTimerButtonText();
-                    scrollToQuestion(index);
+                    updateTimerButtonText(); scrollToQuestion(index);
                 }
                 return;
             }
@@ -440,7 +416,6 @@
             updateAllBlankDisplays();updateKeyboardPreview();refreshActiveBlank();
             updateTimerButtonText();
         }
-
         function inputBackspace(){
             if(activeQuestionIndex<0)return;
             if(currentInput.length===0)return;
@@ -450,19 +425,15 @@
             updateAllBlankDisplays();updateKeyboardPreview();refreshActiveBlank();
             updateTimerButtonText();
         }
-
         function inputClear(){
             if(activeQuestionIndex<0)return;
             currentInput='';delete userAnswers[activeQuestionIndex];
             updateAllBlankDisplays();updateKeyboardPreview();refreshActiveBlank();
             updateTimerButtonText();
         }
-
         function confirmAndNext(){
             if(activeQuestionIndex<0)return;
-            if(currentInput!==''){
-                userAnswers[activeQuestionIndex]=currentInput;
-            }
+            if(currentInput!=='') userAnswers[activeQuestionIndex]=currentInput;
             if(reviewMode){
                 const q=currentQuestions[activeQuestionIndex];
                 const userVal=userAnswers[activeQuestionIndex];
@@ -470,26 +441,17 @@
                     errorQuestions.delete(activeQuestionIndex);
                     document.querySelector(`.question-item[data-qindex="${activeQuestionIndex}"]`)?.classList.remove('error');
                 }else{
+                    if(!firstWrongAnswers.hasOwnProperty(activeQuestionIndex)) firstWrongAnswers[activeQuestionIndex]=userVal;
                     errorQuestions.add(activeQuestionIndex);
                     document.querySelector(`.question-item[data-qindex="${activeQuestionIndex}"]`)?.classList.add('error');
-                    alert('答案不对，请再试试！');
-                    return;
+                    alert('答案不对，请再试试！'); return;
                 }
             }
             document.querySelector(`.question-item[data-qindex="${activeQuestionIndex}"]`)?.classList.add('completed');
             updateTimerButtonText();
             const nextIndex=activeQuestionIndex+1;
-            if(nextIndex<currentQuestions.length){
-                activateQuestion(nextIndex);
-            }else{
-                hideKeyboard();window.scrollTo({top:0,behavior:'smooth'});
-                if(!isSubmitted&&checkAllFilled()){
-                    // 自动弹出交卷提示
-                    alert('🎉 所有题目已填写完毕！请点击“交卷”按钮查看结果。');
-                }else if(isSubmitted){
-                    alert('✅ 错题已修改，继续加油！');
-                }
-            }
+            if(nextIndex<currentQuestions.length) activateQuestion(nextIndex);
+            else { hideKeyboard(); window.scrollTo({top:0,behavior:'smooth'}); }
         }
 
         function refreshActiveBlank(){
@@ -499,13 +461,11 @@
                 if(item){item.classList.add('active');item.querySelector('.blank')?.classList.add('active-blank');}
             }
         }
-
         function updateKeyboardPreview(){
             const preview=document.getElementById('keyboardPreview');
             if(currentInput===''){preview.textContent='___';preview.classList.add('empty');}
             else{preview.textContent=currentInput;preview.classList.remove('empty');}
         }
-
         function updateAllBlankDisplays(){
             document.querySelectorAll('.blank').forEach(blank=>{
                 const idx=parseInt(blank.getAttribute('data-qindex'));
@@ -518,35 +478,24 @@
         }
 
         function renderScreenQuestions(questions){
-            const grid=document.getElementById('questionsGrid');
-            grid.innerHTML='';
-            currentQuestions=questions;userAnswers={};errorQuestions.clear();reviewMode=false;
+            const grid=document.getElementById('questionsGrid'); grid.innerHTML='';
+            currentQuestions=questions;userAnswers={};firstWrongAnswers={};errorQuestions.clear();reviewMode=false;
             isSubmitted=false;activeQuestionIndex=-1;currentInput='';hideKeyboard();
             questions.forEach((q,idx)=>{
-                const item=document.createElement('div');
-                item.className='question-item';item.setAttribute('data-qindex',idx);
-                item.addEventListener('click',function(e){
-                    if(e.target.classList.contains('blank')){e.stopPropagation();activateQuestion(idx);}
-                });
+                const item=document.createElement('div'); item.className='question-item'; item.setAttribute('data-qindex',idx);
+                item.addEventListener('click',function(e){ if(e.target.classList.contains('blank')){e.stopPropagation();activateQuestion(idx);} });
                 let html='';
                 for(let i=0;i<q.totalOps;i++){
                     if(i>0)html+=`<span class="operator"> ${q.operators[i-1]} </span>`;
-                    if(q.blankPosition===i+1){
-                        html+=`<span class="blank" data-qindex="${idx}" onclick="event.stopPropagation(); activateQuestion(${idx});">___</span>`;
-                    }else{
-                        html+=`<span class="number">${q.operands[i]}</span>`;
-                    }
+                    if(q.blankPosition===i+1) html+=`<span class="blank" data-qindex="${idx}">___</span>`;
+                    else html+=`<span class="number">${q.operands[i]}</span>`;
                 }
                 html+=`<span class="equals"> = </span>`;
-                if(q.blankPosition===0){
-                    html+=`<span class="blank" data-qindex="${idx}" onclick="event.stopPropagation(); activateQuestion(${idx});">___</span>`;
-                }else{
-                    html+=`<span class="number">${q.result}</span>`;
-                }
+                if(q.blankPosition===0) html+=`<span class="blank" data-qindex="${idx}">___</span>`;
+                else html+=`<span class="number">${q.result}</span>`;
                 item.innerHTML=html;grid.appendChild(item);
             });
-            updateTimerButtonText();
-            updateKeyboardPreview();
+            updateTimerButtonText();updateKeyboardPreview();
         }
 
         function renderScreenAnswers(questions){
@@ -561,6 +510,77 @@
             else{section.classList.add('visible');btn.classList.add('showing');btn.innerHTML='🙈 隐藏答案';}
         }
 
+        // ============= 下载功能 =============
+        function buildExportHTML() {
+            const name = document.getElementById('studentName').value || '未填写';
+            const date = document.getElementById('practiceDate').value || new Date().toISOString().slice(0,10);
+            const timeStr = document.getElementById('timerDisplay').textContent;
+            let html = `<div class="export-page">
+                <div class="export-header">
+                    <h2>口算练习作业</h2>
+                    <div class="export-info">
+                        <span>姓名：${name}</span>
+                        <span>日期：${date}</span>
+                        <span>用时：${timeStr}</span>
+                    </div>
+                </div>
+                <div class="export-list">`;
+
+            currentQuestions.forEach((q, idx) => {
+                const userVal = userAnswers[idx] || '';
+                const correct = q.blankAnswer;
+                const isWrong = errorQuestions.has(idx);
+                const firstWrong = firstWrongAnswers[idx];
+                const hasCorrection = firstWrong && !isWrong && userVal === String(correct); // 曾经错现在正确
+
+                let display = getQuestionString(q, userVal);
+                let suffix = '';
+                if (hasCorrection) {
+                    suffix = ` <span class="wrong-mark">${firstWrong}</span><span class="correction">△:${correct}</span>`;
+                } else if (isWrong) {
+                    suffix = ` <span class="wrong-mark">✗ ${userVal}</span>`;
+                } else if (userVal !== '') {
+                    suffix = ` ✓`;
+                }
+                html += `<div class="export-item">${idx+1}. ${display}${suffix}</div>`;
+            });
+            html += `</div></div>`;
+            return html;
+        }
+
+        async function downloadPDF() {
+            const exportHTML = buildExportHTML();
+            const container = document.getElementById('exportContainer');
+            container.innerHTML = exportHTML;
+            container.style.display = 'block';
+            // 使用打印功能生成PDF
+            window.print();
+            container.style.display = 'none';
+        }
+
+        async function downloadImage() {
+            const exportHTML = buildExportHTML();
+            const container = document.getElementById('exportContainer');
+            container.innerHTML = exportHTML;
+            container.style.display = 'block';
+            // 等待渲染
+            await new Promise(resolve => setTimeout(resolve, 300));
+            try {
+                const canvas = await html2canvas(container.querySelector('.export-page'), {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+                const link = document.createElement('a');
+                link.download = `口算练习_${document.getElementById('studentName').value||'未命名'}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (e) {
+                alert('图片生成失败，请重试。');
+            }
+            container.style.display = 'none';
+        }
+
         function printMultiplePages(){
             const input=document.getElementById('pageCountInput');let pages=parseInt(input.value,10);
             if(isNaN(pages)||pages<1)pages=1;if(pages>10)pages=10;input.value=pages;
@@ -568,12 +588,11 @@
             for(let p=0;p<pages;p++){
                 const start=p*100,pageQuestions=allQuestions.slice(start,start+100);
                 const day1=pageQuestions.slice(0,50),day2=pageQuestions.slice(50,100);
-                const dayNum1=p*2+1,dayNum2=p*2+2;
                 printHTML+=`<div class="print-page"><div class="page-header"><h2>口 算 练 习</h2><div class="info-line"><span>姓名：__________</span><span>日期：__________</span><span>用时：__________</span></div></div>`;
-                printHTML+=`<div class="day-block"><div class="day-title">第 ${dayNum1} 天 （共50题）</div><div class="questions-grid-print">`;
-                day1.forEach(q=>{printHTML+=`<div class="q-item">${getQuestionString(q,undefined)}</div>`;});
-                printHTML+=`</div></div><div class="day-block"><div class="day-title">第 ${dayNum2} 天 （共50题）</div><div class="questions-grid-print">`;
-                day2.forEach(q=>{printHTML+=`<div class="q-item">${getQuestionString(q,undefined)}</div>`;});
+                printHTML+=`<div class="day-block"><div class="day-title">第 ${p*2+1} 天</div><div class="questions-grid-print">`;
+                day1.forEach(q=>printHTML+=`<div class="q-item">${getQuestionString(q)}</div>`);
+                printHTML+=`</div></div><div class="day-block"><div class="day-title">第 ${p*2+2} 天</div><div class="questions-grid-print">`;
+                day2.forEach(q=>printHTML+=`<div class="q-item">${getQuestionString(q)}</div>`);
                 printHTML+=`</div></div></div>`;
             }
             document.getElementById('printContainer').innerHTML=printHTML;
@@ -597,7 +616,6 @@
             else if(e.key==='Enter'){e.preventDefault();confirmAndNext();}
             else if(e.key==='Escape'){e.preventDefault();hideKeyboard();}
         });
-
         document.addEventListener('click',function(e){
             if(activeQuestionIndex>=0){
                 const panel=document.getElementById('keyboardPanel');
@@ -611,13 +629,12 @@
         window.generateQuestions=generateQuestions;
         window.toggleAnswers=toggleAnswers;
         window.printMultiplePages=printMultiplePages;
+        window.downloadPDF=downloadPDF;
+        window.downloadImage=downloadImage;
         window.handleTimerClick=handleTimerClick;
         window.resetTimerOnly=resetTimerOnly;
-        window.inputDigit=inputDigit;
-        window.inputBackspace=inputBackspace;
-        window.inputClear=inputClear;
-        window.confirmAndNext=confirmAndNext;
-        window.activateQuestion=activateQuestion;
+        window.inputDigit=inputDigit;window.inputBackspace=inputBackspace;window.inputClear=inputClear;
+        window.confirmAndNext=confirmAndNext;window.activateQuestion=activateQuestion;
 
         document.addEventListener('DOMContentLoaded',()=>{generateQuestions();updateTimerDisplay();});
     })();
