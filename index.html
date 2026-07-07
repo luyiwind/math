@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>口算练习 - 100以内不进位不退位加减法（终极版）</title>
+    <title>口算练习 - 100以内不进位不退位加减法（最终修复版）</title>
     <style>
         :root {
             --bg: #fdf8f3; --card-bg: #ffffff; --primary: #4a90d9; --accent: #f6a623;
@@ -276,18 +276,15 @@
             reviewMode=true;
         }
 
-        // 键盘遮挡修复：动态调整body底部内边距
         function showKey(){
             const panel = document.getElementById('keyboardPanel');
             panel.classList.add('visible');
-            // 调整body的padding-bottom，防止遮挡最后一道题
             const panelHeight = panel.offsetHeight;
             document.body.style.paddingBottom = `${panelHeight + 20}px`;
         }
         function hideKey(){
             const panel = document.getElementById('keyboardPanel');
             panel.classList.remove('visible');
-            // 恢复body的默认padding
             document.body.style.paddingBottom = '200px';
             activeIdx=-1; currentInput=''; updateBlanks(); updatePreview();
             document.querySelectorAll('.active').forEach(el=>el.classList.remove('active'));
@@ -305,9 +302,11 @@
             }
             document.querySelectorAll('.active').forEach(el=>el.classList.remove('active'));
             document.querySelectorAll('.active-blank').forEach(el=>el.classList.remove('active-blank'));
-            activeIdx=idx; currentInput=userAnswers[idx]||''; updateBlanks(); updatePreview();
+            activeIdx=idx;
+            currentInput = userAnswers[idx] || '';
+            // 如果是修改错误题目，第一次输入数字时会自动覆盖，但先保留旧值显示
+            updateBlanks(); updatePreview();
             showKey();
-            // 滚动到当前题目，并留出键盘空间
             setTimeout(() => {
                 const item = document.querySelector(`.question-item[data-qindex="${idx}"]`);
                 if (item) {
@@ -325,19 +324,39 @@
             let item=document.querySelector(`.question-item[data-qindex="${idx}"]`);
             if(item){ item.classList.add('active'); item.querySelector('.blank')?.classList.add('active-blank'); }
         }
-        function digit(d){ if(activeIdx<0||currentInput.length>=MAX_LEN) return; currentInput+=d; userAnswers[activeIdx]=currentInput; updateBlanks(); updatePreview(); updateBtn(); }
-        function backspace(){ if(activeIdx<0||!currentInput) return; currentInput=currentInput.slice(0,-1); userAnswers[activeIdx]=currentInput; if(!currentInput) delete userAnswers[activeIdx]; updateBlanks(); updatePreview(); updateBtn(); }
-        function clearInput(){ if(activeIdx<0) return; currentInput=''; delete userAnswers[activeIdx]; updateBlanks(); updatePreview(); updateBtn(); }
+        function digit(d){
+            if(activeIdx<0) return;
+            // 修改错误题目时，首次输入直接覆盖
+            if(reviewMode && errorQuestions.has(activeIdx) && currentInput === userAnswers[activeIdx]) {
+                currentInput = '';
+            }
+            if(currentInput.length >= MAX_LEN) return;
+            currentInput += d;
+            userAnswers[activeIdx] = currentInput;
+            updateBlanks(); updatePreview(); updateBtn();
+        }
+        function backspace(){
+            if(activeIdx<0||!currentInput) return;
+            currentInput = currentInput.slice(0,-1);
+            userAnswers[activeIdx] = currentInput;
+            if(!currentInput) delete userAnswers[activeIdx];
+            updateBlanks(); updatePreview(); updateBtn();
+        }
+        function clearInput(){
+            if(activeIdx<0) return;
+            currentInput = ''; delete userAnswers[activeIdx];
+            updateBlanks(); updatePreview(); updateBtn();
+        }
         function confirmNext(){
             if(activeIdx<0) return;
-            if(currentInput!=='') userAnswers[activeIdx]=currentInput;
+            if(currentInput!=='') userAnswers[activeIdx] = currentInput;
             if(reviewMode){
                 let q=currentQuestions[activeIdx], u=userAnswers[activeIdx];
                 if(u!==undefined&&u!==''&&parseInt(u)===q.ans){
                     errorQuestions.delete(activeIdx);
                     document.querySelector(`.question-item[data-qindex="${activeIdx}"]`)?.classList.remove('error');
                 }else{
-                    if(!(activeIdx in firstWrongAnswers)) firstWrongAnswers[activeIdx]=u;
+                    if(!(activeIdx in firstWrongAnswers)) firstWrongAnswers[activeIdx] = u;
                     errorQuestions.add(activeIdx);
                     document.querySelector(`.question-item[data-qindex="${activeIdx}"]`)?.classList.add('error');
                     alert('答案不对，请再试试！'); return;
@@ -345,8 +364,8 @@
             }
             document.querySelector(`.question-item[data-qindex="${activeIdx}"]`)?.classList.add('completed');
             updateBtn();
-            let next=activeIdx+1;
-            if(next<currentQuestions.length) activateQuestion(next);
+            let next = activeIdx+1;
+            if(next < currentQuestions.length) activateQuestion(next);
             else {
                 hideKey(); window.scrollTo({top:0,behavior:'smooth'});
                 if(isSubmitted && errorQuestions.size===0) setTimeout(downloadImage,500);
@@ -391,7 +410,6 @@
             sec.style.display=vis?'none':'block'; btn.classList.toggle('showing',!vis); btn.innerHTML=vis?'👁️ 显示答案':'🙈 隐藏答案';
         }
 
-        // 打印
         function printMultiplePages(){
             let inp=document.getElementById('pageCountInput'); let pages=parseInt(inp.value)||1; if(pages>10) pages=10; inp.value=pages;
             let all=genSet(pages*100), html='';
@@ -409,20 +427,15 @@
             setTimeout(()=>{ window.print(); document.getElementById('printContainer').style.display='none'; },200);
         }
 
-        // 图片导出（修正：第一次错误答案显示在算式中，改正后标注△）
         function buildExport(){
             let name = document.getElementById('studentName').value || '未填';
             let date = document.getElementById('practiceDate').value || new Date().toISOString().slice(0,10);
             let time = document.getElementById('timerDisplay').textContent;
+            // 独立批改逻辑
             let tempErrors = new Set();
-            let tempFirstWrong = {};
             currentQuestions.forEach((q,i)=>{
                 let u = userAnswers[i];
-                if(u !== undefined && u !== '' && parseInt(u) !== q.ans){
-                    tempErrors.add(i);
-                    if(isSubmitted && firstWrongAnswers.hasOwnProperty(i)) tempFirstWrong[i] = firstWrongAnswers[i];
-                    else tempFirstWrong[i] = u;
-                }
+                if(u !== undefined && u !== '' && parseInt(u) !== q.ans) tempErrors.add(i);
             });
 
             let html = `<div class="export-page">
@@ -432,22 +445,22 @@
             currentQuestions.forEach((q,i)=>{
                 let u = userAnswers[i] || '';
                 let correct = q.ans;
-                let isWrong = tempErrors.has(i);
-                let first = tempFirstWrong[i];
-                let hasCorrection = first && !isWrong && u === String(correct); // 曾经错现已改正
-                let displayVal;
-                if (hasCorrection) {
-                    displayVal = first; // 算式中显示第一次错误的答案
-                } else if (isWrong) {
-                    displayVal = u; // 仍然错误，显示当前错误答案
-                } else {
-                    displayVal = u; // 正确或未填
+                let isError = tempErrors.has(i);
+                let hasFirstWrong = firstWrongAnswers.hasOwnProperty(i);
+                let isCorrected = hasFirstWrong && !isError; // 曾经错误且现已改正
+
+                let displayVal = u;
+                let suffix = '';
+                if (isCorrected) {
+                    displayVal = firstWrongAnswers[i]; // 算式中显示第一次错误答案
+                    suffix = ` <span class="correction">△:${correct}</span>`;
+                } else if (isError) {
+                    displayVal = u; // 当前错误答案
+                    suffix = ` <span class="wrong-mark">✗</span>`;
+                } else if (u !== '') {
+                    suffix = ' ✓';
                 }
                 let str = qStr(q, displayVal);
-                let suffix = '';
-                if (hasCorrection) suffix = ` <span class="wrong-mark">✗</span><span class="correction">△:${correct}</span>`;
-                else if (isWrong) suffix = ` <span class="wrong-mark">✗</span>`;
-                else if (u !== '') suffix = ' ✓';
                 html += `<div class="export-item">${i+1}. ${str}${suffix}</div>`;
             });
             html += `</div></div>`;
